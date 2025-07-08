@@ -49,6 +49,7 @@
 
     .dashboard {
       padding: 40px 20px;
+      margin-top: 60px; /* Añadir margen superior */
     }
 
     .icon-card {
@@ -86,20 +87,18 @@
 
 <?php
   session_start(); // Iniciar la sesión
-  ?>
+?>
 
   <!-- Barra de Navegación -->
   <nav class="navbar navbar-expand-lg fixed-top shadow">
     <div class="container-fluid">
       <a class="navbar-brand d-flex align-items-center" href="#">
         <img src="icons/logo.png" alt="Logo Ambulatorio" class="logo" />
-        Ambulatorio Libertador
+        Ambulatorio Urbano I Libertador
       </a>
       <button class="navbar-toggler bg-light" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
         <span class="navbar-toggler-icon"></span>
       </button>
-        </ul>
-      </div>
     </div>
   </nav>
 
@@ -112,76 +111,34 @@
   <div class="container dashboard">
     <div class="row g-4">
       <div class="col-6 col-md-4">
-        <a href="registros_medicos.php" class="text-decoration-none text-dark">
+        <a href="Personal_medico/personal.php" class="text-decoration-none text-dark">
           <div class="icon-card">
             <img src="icons/afiliado.png" alt="Afiliado" />
-            <h5>Registros Médicos</h5>
+            <h5>Personal Médico</h5>
           </div>
         </a>
       </div>
       <div class="col-6 col-md-4">
-        <a href="registro_pacientes.php" class="text-decoration-none text-dark">
+        <a href="Pacientes/pacientes.php" class="text-decoration-none text-dark">
           <div class="icon-card">
             <img src="icons/nuevo_ingreso.png" alt="Nuevo Ingreso" />
-            <h5>Ingresar Nuevo Registro</h5>
-          </div>
-        </a>
-      </div>
-
-      <div class="col-6 col-md-4">
-        <a href="ver_jornadas.php" class="text-decoration-none text-dark">
-          <div class="icon-card">
-            <img src="icons/control_medico.png" alt="Control Médico" />
-            <h5>55</h5>
-          </div>
-      </div>
-
-
-      <div class="col-6 col-md-4">
-        <a href="citas_médicas.php" class="text-decoration-none text-dark">
-          <div class="icon-card">
-            <img src="icons/citas.png" alt="Citas" />
-            <h5>Citas</h5>
+            <h5>Pacientes</h5>
           </div>
         </a>
       </div>
       <div class="col-6 col-md-4">
-        <a href="registrar_jornada.php" class="text-decoration-none text-dark">
+        <a href="vacunas/jornada.php" class="text-decoration-none text-dark">
           <div class="icon-card">
             <img src="icons/unidad_medica.png" alt="Vacunas" />
             <h5>Vacunas</h5>
           </div>
         </a>
       </div>
-      <div class="col-6 col-md-4">
-        <a href="usuarios.php" class="text-decoration-none text-dark">
-          <div class="icon-card">
-            <img src="icons/usuarios.png" alt="Usuarios" />
-            <h5>Usuarios</h5>
-          </div>
-        </a>
-      </div>
-      <div class="col-6 col-md-4">
-        <a href="configuracion.html" class="text-decoration-none text-dark">
-          <div class="icon-card">
-            <img src="icons/configuracion.png" alt="Configuración" />
-            <h5>Configuración</h5>
-          </div>
-        </a>
-      </div>
-      <div class="col-6 col-md-4">
+      <div class="col-12 text-center">
         <a href="cerrar.php" class="text-decoration-none text-dark">
           <div class="icon-card">
             <img src="icons/salir.png" alt="Cerrar Sesión" />
             <h5>Cerrar Sesión</h5>
-          </div>
-        </a>
-      </div>
-      <div class="col-6 col-md-4">
-        <a href="reportes.php" class="text-decoration-none text-dark">
-          <div class="icon-card">
-            <img src="icons/reportes.png" alt="Reportes" />
-            <h5>Reportes & Estadísticas</h5>
           </div>
         </a>
       </div>

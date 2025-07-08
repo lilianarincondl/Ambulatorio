@@ -16,7 +16,7 @@ try {
 // Procesamiento de operaciones CRUD
 if (isset($_GET['eliminar'])) {
     $id = $_GET['eliminar'];
-    $stmt = $pdo->prepare("DELETE FROM registros WHERE id = ?");
+    $stmt = $pdo->prepare("DELETE FROM jornadas WHERE id = ?");
     if ($stmt->execute([$id])) {
         $mensaje = "Registro eliminado correctamente";
     }
@@ -57,9 +57,9 @@ if (isset($_GET['buscar'])) {
         $parametro[':anio'] = $_GET['anio_busqueda'];
     }
     
-    // Filtro por texto (busca en establecimiento o responsable)
+    // Filtro por texto (busca en establecimiento o responsables)
     if (!empty($_GET['texto_busqueda'])) {
-        $filtros[] = "(establecimiento LIKE :texto OR responsable LIKE :texto)";
+        $filtros[] = "(establecimiento LIKE :texto OR responsables LIKE :texto)";
         $parametro[':texto'] = '%' . $_GET['texto_busqueda'] . '%';
     }
     
@@ -70,7 +70,7 @@ if (isset($_GET['buscar'])) {
 }
 
 // Obtener registros
-$sql = "SELECT * FROM registros $condicion ORDER BY fecha DESC";
+$sql = "SELECT * FROM jornadas $condicion ORDER BY fecha DESC";
 $stmt = $pdo->prepare($sql);
 $stmt->execute($parametro);
 $registros = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -81,15 +81,30 @@ $registros = $stmt->fetchAll(PDO::FETCH_ASSOC);
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestión de Registros</title>
-    <link rel="stylesheet" href="bootstrap/css/bootstrap.min.css">
+    <title>Gestión de Jornadas</title>
+    <link rel="stylesheet" href="../bootstrap/css/bootstrap.min.css">
     <style>
+        /* Barra de navegacion */
         body { background-color: #FFFFFF; }
-        .navbar { background-color: #87CEEB !important; }
-        .contenedor-tabla {
-            margin: 20px auto;
-            padding: 0 15px;
+        .navbar {
+        background-color: #aa0b0b;
+        padding: 0.6rem 1.2rem;
         }
+
+        .navbar-brand,
+        .nav-link {
+        color: #fff !important;
+        font-weight: 500;
+        }
+
+        .nav-link:hover {
+        color: #cce5ff !important;
+        }
+
+        .navbar-toggler {
+        background-color: #ffffff;
+        }
+
         .acciones-cell { width: 150px; }
     
         /* Bordes más gruesos */
@@ -152,12 +167,25 @@ $registros = $stmt->fetchAll(PDO::FETCH_ASSOC);
     </style>
 </head>
 <body>
-    <!-- Navegacion -->
-    <nav class="navbar navbar-expand-lg navbar-dark">
+    <!-- Barra de Navegación -->
+    <nav class="navbar navbar-expand-lg fixed-top shadow">
         <div class="container-fluid">
-            <a class="navbar-brand" href="#">Sistema de Registros</a>
+            <a class="navbar-brand d-flex align-items-center" href="#">
+                <img src="../icons/logo.png" alt="Logo Ambulatorio" style="height: 40px; margin-right: 10px;" />
+                Ambulatorio Urbano I Libertador
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
+                <ul class="navbar-nav">
+                    <li class="nav-item"><a class="nav-link" href="../dashboard.php">Inicio</a></li>
+                </ul>
+            </div>
         </div>
     </nav>
+    <!-- Espacio para que el contenido no quede debajo de la navbar fija -->
+    <div style="height: 70px;"></div>
 
     <div class="container mt-4">
         <!-- BARRA DE BÚSQUEDA Y BOTÓN NUEVO -->
@@ -212,7 +240,7 @@ $registros = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 </form>
             </div>
             <div class="col-md-4 text-end">
-                <a href="nuevo_registro.php" class="btn btn-success">Nuevo Registro</a>
+                <a href="registrar_jornada.php" class="btn btn-success">Nueva Jornada</a>
             </div>
         </div>
 
@@ -228,7 +256,7 @@ $registros = $stmt->fetchAll(PDO::FETCH_ASSOC);
                         <tr>
                             <th>Fecha</th>
                             <th>Establecimiento</th>
-                            <th>Responsable</th>
+                            <th>Responsables</th>
                             <th>Acciones</th>
                         </tr>
                     </thead>
@@ -243,10 +271,9 @@ $registros = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                 <!-- Formatear fecha como día/mes/año -->
                                 <td><?= date('d/m/Y', strtotime($r['fecha'])) ?></td>
                                 <td><?= htmlspecialchars($r['establecimiento']) ?></td>
-                                <td><?= htmlspecialchars($r['responsable']) ?></td>
+                                <td><?= htmlspecialchars($r['responsables']) ?></td>
                                 <td class="acciones-cell">
-                                    <a href="editar.php?id=<?= $r['id'] ?>" class="btn btn-sm btn-warning">Editar</a>
-                                    <a href="generar_pdf.php?id=<?= $r['id'] ?>" class="btn btn-sm btn-info">PDF</a>
+                                    <a href="editar_jornada.php?id=<?= $r['id'] ?>" class="btn btn-sm btn-warning">Editar</a>
                                     <a href="?eliminar=<?= $r['id'] ?>" 
                                        class="btn btn-sm btn-danger"
                                        onclick="return confirm('¿Estás seguro de eliminar este registro?')">Eliminar</a>
@@ -260,6 +287,6 @@ $registros = $stmt->fetchAll(PDO::FETCH_ASSOC);
         </div>
     </div>
 
-    <script src="bootstrap/js/bootstrap.min.js"></script>
+    <script src="../bootstrap/js/bootstrap.min.js"></script>
 </body>
 </html>

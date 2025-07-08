@@ -25,6 +25,11 @@ $result = $query->get_result(); // Obtener el resultado
 if ($result->num_rows == 1) {
     $row = $result->fetch_assoc();
 
+    // Depuración: imprimir la contraseña ingresada y el hash almacenado
+    // echo "Contraseña ingresada: " . $pass . "<br>";
+    // echo "Hash almacenado: " . $row['pass'] . "<br>";
+
+    // Verificar la contraseña
     if (password_verify($pass, $row['pass'])) {
         $_SESSION['id_usu'] = $row['id'];
         $_SESSION['nombre_usu'] = $row['nombre'];
