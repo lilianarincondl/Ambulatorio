@@ -1,187 +1,250 @@
+<?php
+// 1. LÓGICA PHP AL PRINCIPIO
+session_start();
+
+// Conexión
+$conn = new mysqli('localhost', 'root', '', 'ambulatorio');
+if ($conn->connect_error) { die("Conexión fallida: " . $conn->connect_error); }
+
+// Lógica de Borrado (Antes de mostrar nada)
+if (isset($_GET['borrar'])) {
+    $id_borrar = base64_decode($_GET['borrar']);
+    $id_borrar = intval($id_borrar);
+    
+    if ($id_borrar > 0) {
+        $stmt = $conn->prepare("DELETE FROM pacientes WHERE id = ?");
+        $stmt->bind_param("i", $id_borrar);
+        $stmt->execute();
+        $stmt->close();
+    }
+    // Redirección limpia
+    header("Location: pacientes.php");
+    exit();
+}
+
+// Lógica de Búsqueda
+$where = "";
+if (!empty($_GET['busqueda'])) {
+    $busqueda = $conn->real_escape_string($_GET['busqueda']);
+    $where = "WHERE nombres LIKE '%$busqueda%' OR apellidos LIKE '%$busqueda%' OR cedula LIKE '%$busqueda%'";
+}
+
+$sql = "SELECT * FROM pacientes $where ORDER BY id DESC LIMIT 10";
+$result = $conn->query($sql);
+?>
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Pacientes</title>
+  <title>Pacientes | Ambulatorio</title>
+  
   <link rel="stylesheet" href="../bootstrap/css/bootstrap.min.css">
+
   <style>
+    /* --- ESTILO GENERAL --- */
     body {
-      background: #f1f5f9;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #eef2f6;
+      font-family: 'Segoe UI', system-ui, sans-serif;
     }
 
+    /* --- NAVBAR --- */
     .navbar {
-      background-color: #aa0b0b;
-      padding: 0.6rem 1.2rem;
+      background: linear-gradient(90deg, #aa0b0b 0%, #003366 100%);
+      padding: 10px 0;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
     }
-
-    .navbar-brand,
-    .nav-link {
-      color: #fff !important;
-      font-weight: 500;
-    }
-
-    .nav-link:hover {
-      color: #cce5ff !important;
-    }
-
-    .form-container {
-      background: #ffffff;
-      padding: 2rem;
-      border-radius: 1rem;
-      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
-      max-width: 1000px;
-      margin: 5rem auto 2rem;
-    }
-
-    h1, h2 {
-      color: #1e3d59;
-    }
-
-    .form-label {
+    
+    .navbar-brand {
       font-weight: 600;
-      color: #34495e;
+      color: white !important;
+      font-size: 1.1rem;
     }
 
-    .headline {
-      background: #e3efff;
-      padding: 0.5rem 1rem;
-      border-radius: 0.5rem;
-      margin: 1.5rem 0 1rem;
-      border-left: 5px solid  #aa0b0b;;
+    .btn-volver {
+        color: white;
+        border: 1px solid rgba(255,255,255,0.5);
+        padding: 5px 15px;
+        border-radius: 20px;
+        text-decoration: none;
+        font-size: 14px;
+        transition: 0.3s;
+    }
+    .btn-volver:hover {
+        background: rgba(255,255,255,0.2);
+        color: white;
     }
 
-    .form-section {
-      display: none;
-      animation: fadeIn 0.3s ease-in-out;
+    /* --- TARJETA PRINCIPAL --- */
+    .main-card {
+      background: white;
+      border-radius: 20px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+      padding: 30px;
+      margin-top: 30px;
+      margin-bottom: 30px;
     }
 
-    .form-section.active {
-      display: block;
+    /* --- TABLA --- */
+    .table-container {
+        border-radius: 15px;
+        overflow: hidden;
+        border: 1px solid #eee;
     }
 
-    .navigation-buttons {
-      text-align: center;
-      margin-top: 2rem;
+    .table thead {
+        background-color: #003366; /* Azul Médico */
+        color: white;
     }
 
-    .btn {
-      padding: 0.5rem 1.5rem;
-      font-weight: 500;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    .table th {
+        font-weight: 500;
+        padding: 15px;
+        border: none;
     }
 
-    @keyframes fadeIn {
-      from { opacity: 0; }
-      to { opacity: 1; }
+    .table td {
+        padding: 15px;
+        vertical-align: middle;
+        color: #555;
     }
 
-    .navbar-toggler {
-      background-color: #ffffff;
+    .table-hover tbody tr:hover {
+        background-color: #f8f9fa;
     }
 
-    @media (max-width: 768px) {
-      .navbar-nav {
-        text-align: center;
-      }
+    /* --- BOTONES ACCIÓN --- */
+    .btn-action {
+        width: 35px;
+        height: 35px;
+        border-radius: 8px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border: none;
+        transition: 0.2s;
+        text-decoration: none;
+    }
+
+    .btn-edit { background: #e3f2fd; color: #003366; }
+    .btn-edit:hover { background: #003366; color: white; }
+
+    .btn-delete { background: #ffebee; color: #aa0b0b; }
+    .btn-delete:hover { background: #aa0b0b; color: white; }
+
+    /* Buscador */
+    .search-input {
+        border-radius: 20px 0 0 20px;
+        border: 1px solid #ced4da;
+        padding-left: 20px;
+    }
+    .btn-search {
+        border-radius: 0 20px 20px 0;
+        background: #003366;
+        color: white;
+        border: none;
     }
   </style>
 </head>
 <body>
 
-  <!-- Barra de Navegación -->
-  <nav class="navbar navbar-expand-lg fixed-top shadow">
-    <div class="container-fluid">
-      <a class="navbar-brand d-flex align-items-center" href="#">
-        <img src="../icons/logo.png" alt="Logo Ambulatorio" style="height: 40px; margin-right: 10px;" />
-        Ambulatorio Urbano I Libertador
+  <nav class="navbar navbar-expand-lg fixed-top">
+    <div class="container-fluid px-4">
+      <a class="navbar-brand d-flex align-items-center gap-2" href="#">
+        <img src="../icons/logo.png" alt="Logo" style="height: 40px; background: white; border-radius: 50%; padding: 2px;" />
+        <span>Gestión de Pacientes</span>
       </a>
-      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-        <span class="navbar-toggler-icon"></span>
-      </button>
-      <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
-        <ul class="navbar-nav">
-          <li class="nav-item"><a class="nav-link" href="../dashboard.php">Inicio</a></li>
-        </ul>
+      
+      <div class="ms-auto">
+        <a class="btn-volver" href="../dashboard.php">← Volver al Inicio</a>
       </div>
     </div>
   </nav>
 
-  <!-- CRUD Personal Médico -->
-  <div class="container-fluid py-4">
-    <div class="form-container">
-      <h1 class="text-center mb-4">Pacientes</h1>
-      <div class="d-flex justify-content-between align-items-center mb-3">
-        <form class="d-flex" method="get" action="">
-          <input class="form-control me-2" type="search" name="busqueda" placeholder="Buscar por nombres, apellidos o cédula" value="<?php echo isset($_GET['busqueda']) ? htmlspecialchars($_GET['busqueda']) : '' ?>">
-          <button class="btn btn-outline-primary me-2" type="submit">Buscar</button>
-          <a href="pacientes.php" class="btn btn-secondary">Limpiar</a>
-        </form>
-        <a href="registro_pacientes.php" class="btn btn-success">Agregar paciente</a>
+  <div style="height: 70px;"></div>
+
+  <div class="container">
+    <div class="main-card">
+      
+      <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-3">
+          <div>
+              <h2 style="color: #003366; font-weight: 700; margin: 0;">Lista de Pacientes</h2>
+              <p class="text-muted m-0">Registro y control de historias médicas</p>
+          </div>
+          <a href="registro_pacientes.php" class="btn btn-danger" style="background: #aa0b0b; border: none; padding: 10px 20px; border-radius: 10px; font-weight: 500;">
+            + Nuevo Paciente
+          </a>
       </div>
-      <div class="table-responsive" style="max-height: 420px; overflow-y: auto;">
-        <table class="table table-striped table-hover align-middle mb-0">
-          <thead class="table-dark">
-            <tr>
-              <th>#</th>
-              <th>Nombres</th>
-              <th>Apellidos</th>
-              <th>Cédula</th>
-              <th>Acciones</th>
-            </tr>
-          </thead>
-          <tbody>
-            <?php
-            // Conexión a la base de datos
-            $conn = new mysqli('localhost', 'root', '', 'ambulatorio');
-            if ($conn->connect_error) {
-              die("Error de conexión: " . $conn->connect_error);
-            }
-            $where = "";
-            if (!empty($_GET['busqueda'])) {
-              $busqueda = $conn->real_escape_string($_GET['busqueda']);
-              $where = "WHERE nombres LIKE '%$busqueda%' OR apellidos LIKE '%$busqueda%' OR cedula LIKE '%$busqueda%'";
-            }
-            // Limitar a 8 resultados por página visual
-            $sql = "SELECT * FROM pacientes $where ORDER BY id DESC LIMIT 8";
-            $result = $conn->query($sql);
-            if ($result && $result->num_rows > 0) {
-              $i = 1;
-              while ($row = $result->fetch_assoc()) {
-                echo "<tr>";
-                echo "<td>" . $i++ . "</td>";
-                echo "<td>" . htmlspecialchars($row['nombres']) . "</td>";
-                echo "<td>" . htmlspecialchars($row['apellidos']) . "</td>";
-                echo "<td>" . htmlspecialchars($row['cedula']) . "</td>";
-                echo "<td>";
-                $id_cifrado = base64_encode($row['id']);
-                echo '<a href="editar_paciente.php?id=' . $id_cifrado . '" class="btn btn-sm btn-primary me-1">Editar</a>';
-                echo '<a href="pacientes.php?borrar=' . $id_cifrado . '" class="btn btn-sm btn-danger" onclick="return confirm(\'¿Seguro que deseas borrar este paciente?\')">Borrar</a>';
-                echo "</td>";
-                echo "</tr>";
-              }
-            } else {
-              echo '<tr><td colspan="5" class="text-center">No se encontraron resultados.</td></tr>';
-            }
-            // Borrar paciente
-            if (isset($_GET['borrar'])) {
-              $id_borrar = base64_decode($_GET['borrar']);
-              $id_borrar = intval($id_borrar);
-              if ($id_borrar > 0) {
-                $conn->query("DELETE FROM pacientes WHERE id = $id_borrar");
-              }
-              echo "<script>window.location='pacientes.php';</script>";
-            }
-            $conn->close();
-            ?>
-          </tbody>
-        </table>
+
+      <div class="row mb-4">
+          <div class="col-md-6">
+              <form class="d-flex" method="get" action="">
+                <input class="form-control search-input" type="search" name="busqueda" 
+                       placeholder="Buscar por nombre, apellido o cédula..." 
+                       value="<?php echo isset($_GET['busqueda']) ? htmlspecialchars($_GET['busqueda']) : '' ?>">
+                <button class="btn btn-search px-4" type="submit">Buscar</button>
+                
+                <?php if(!empty($_GET['busqueda'])): ?>
+                    <a href="pacientes.php" class="btn btn-light ms-2" style="border-radius: 20px; border: 1px solid #ddd;">Limpiar</a>
+                <?php endif; ?>
+              </form>
+          </div>
       </div>
+
+      <div class="table-container">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Nombres</th>
+                  <th>Apellidos</th>
+                  <th>Cédula</th>
+                  <th class="text-center">Acciones</th>
+                </tr>
+              </thead>
+              <tbody>
+                <?php
+                if ($result && $result->num_rows > 0) {
+                  $contador = 1;
+                  while ($row = $result->fetch_assoc()) {
+                    $id_cifrado = base64_encode($row['id']);
+                ?>
+                    <tr>
+                      <td><?php echo $contador++; ?></td>
+                      <td style="font-weight: 500;"><?php echo htmlspecialchars($row['nombres']); ?></td>
+                      <td><?php echo htmlspecialchars($row['apellidos']); ?></td>
+                      <td><?php echo htmlspecialchars($row['cedula']); ?></td>
+                      <td class="text-center">
+                        <a href="editar_paciente.php?id=<?php echo $id_cifrado; ?>" class="btn-action btn-edit me-1" title="Editar">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-10 10a.5.5 0 0 1-.168.11l-5 2a.5.5 0 0 1-.65-.65l2-5a.5.5 0 0 1 .11-.168l10-10zM11.207 2.5 13.5 4.793 14.793 3.5 12.5 1.207 11.207 2.5zm1.586 3L10.5 3.207 4 9.707V10h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.293l6.5-6.5zm-9.761 5.175-.106.106-1.528 3.821 3.821-1.528.106-.106A.5.5 0 0 1 5 12.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.468-.325z"/></svg>
+                        </a>
+                        
+                        <a href="pacientes.php?borrar=<?php echo $id_cifrado; ?>" class="btn-action btn-delete" 
+                           onclick="return confirm('¿Estás seguro de eliminar al paciente <?php echo $row['nombres']; ?>?');" title="Eliminar">
+                           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5Zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5Zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6Z"/><path d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1ZM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118ZM2.5 3h11V2h-11v1Z"/></svg>
+                        </a>
+                      </td>
+                    </tr>
+                <?php 
+                  }
+                } else {
+                  echo '<tr><td colspan="5" class="text-center py-4 text-muted">No se encontraron pacientes registrados.</td></tr>';
+                }
+                ?>
+              </tbody>
+            </table>
+        </div>
+      </div>
+
     </div>
   </div>
 
-  
-  <script src="../bootstrap/js/bootstrap.min.js"></script>
+  <script src="../bootstrap/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
+
+<?php
+$conn->close();
+?>

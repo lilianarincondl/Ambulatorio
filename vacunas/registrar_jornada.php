@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sistema de Registro de Vacunación</title>
     <link rel="stylesheet" href="../bootstrap/css/bootstrap.min.css">
-    <link rel="stylesheet" href="registro_vacunas.css">
+    <link rel="stylesheet" href="registro_vacuna.css">
 </head>
 <body>
 
@@ -16,13 +16,14 @@
             <img src="../icons/logo.png" alt="Logo Ambulatorio" style="height: 40px; margin-right: 10px;" />
            Ambulatorio Urbano I Libertador
         </a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
             <ul class="navbar-nav">
-            <li class="nav-item"><a class="nav-link" href="../dashboard.php">Inicio</a></li>
-            <li class="nav-item"><a class="nav-link" href="jornada.php">Atras</a></li>
+            <div class="ms-auto">
+        <a class="btn-volver" href="jornada.php">← Atrás</a>
+      </div>
             </ul>
         </div>
         </div>
@@ -155,17 +156,14 @@
                             <td><input type="text" name="apellido[]" required></td>
                             <td><input type="date" name="fecha_nacimiento[]" required></td>
                             <td>
-                                <select name="nacionalidad[]">
+                                <select name="nacionalidad[]" required>
                                     <option value="">Seleccionar</option>
-                                    <option value="Ecuatoriana">Ecuatoriana</option>
-                                    <option value="Colombiana">Colombiana</option>
-                                    <option value="Peruana">Peruana</option>
                                     <option value="Venezolana">Venezolana</option>
-                                    <option value="Otra">Otra</option>
+                                    <option value="Extranjera">Extranjera</option>
                                 </select>
                             </td>
                             <td><input type="text" name="documento[]" required></td>
-                            <td><input type="number" name="orden_hijo[]" min="1" max="20"></td>
+                            <td><input type="text" name="orden_hijo[]" placeholder=""></td>
                             <td><input type="text" name="direccion[]"></td>
                             <td><input type="text" name="etnia[]"></td>
                             <td><input type="number" name="edad[]" min="0" max="120"></td>
@@ -322,7 +320,7 @@
                             </td>
                             <td><input type="text" name="observaciones[]"></td>
                             <td>
-                                <button type="button" class="delete-row"><i class="fas fa-trash"></i></button>
+                                <button type="button" class="btn btn-danger btn-sm delete-row" style="min-width:90px;"> <i class="fas fa-trash"></i> Eliminar</button>
                             </td>
                         </tr>
                     </tbody>
@@ -468,7 +466,6 @@
         </form>
         
         <div class="footer">
-            Sistema de Información del Programa Ampliado de Inmunizaciones &copy; 2023
         </div>
     </div>
     
@@ -476,6 +473,7 @@
         <i class="fas fa-check-circle"></i> <span id="notification-text">Registro guardado exitosamente!</span>
     </div>
     
+    <script src="../bootstrap/js/bootstrap.bundle.min.js"></script>
     <script>
         // Contador para filas
         let rowCount = 1;
@@ -492,17 +490,14 @@
     <td><input type="text" name="apellido[]" required></td>
     <td><input type="date" name="fecha_nacimiento[]" required></td>
     <td>
-        <select name="nacionalidad[]">
+        <select name="nacionalidad[]" required>
             <option value="">Seleccionar</option>
-            <option value="Ecuatoriana">Ecuatoriana</option>
-            <option value="Colombiana">Colombiana</option>
-            <option value="Peruana">Peruana</option>
             <option value="Venezolana">Venezolana</option>
-            <option value="Otra">Otra</option>
+            <option value="Extranjera">Extranjera</option>
         </select>
     </td>
     <td><input type="text" name="documento[]" required></td>
-    <td><input type="number" name="orden_hijo[]" min="1" max="20"></td>
+    <td><input type="text" name="orden_hijo[]" placeholder=""></td>
     <td><input type="text" name="direccion[]"></td>
     <td><input type="text" name="etnia[]"></td>
     <td><input type="number" name="edad[]" min="0" max="120"></td>
@@ -657,7 +652,7 @@
     </td>
     <td><input type="text" name="observaciones[]"></td>
     <td>
-        <button type="button" class="delete-row"><i class="fas fa-trash"></i></button>
+        <button type="button" class="btn btn-danger btn-sm delete-row" style="min-width:90px;"> <i class="fas fa-trash"></i> Eliminar</button>
     </td>
 `;
             

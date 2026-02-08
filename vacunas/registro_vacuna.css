@@ -1,28 +1,34 @@
-/* Barra de navegacion */
-        .navbar {
-        background-color: #aa0b0b;
-        padding: 0.6rem 1.2rem;
-        }
+  /* --- NAVBAR --- */
+    .navbar {
+      background: linear-gradient(90deg, #aa0b0b 0%, #003366 100%);
+      padding: 10px 0;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    
+    .navbar-brand {
+      font-weight: 600;
+      color: white !important;
+      font-size: 1.1rem;
+    }
 
-        .navbar-brand,
-        .nav-link {
-        color: #fff !important;
-        font-weight: 500;
-        }
-
-        .nav-link:hover {
-        color: #cce5ff !important;
-        }
-
-        .navbar-toggler {
-        background-color: #ffffff;
-        }
-
-        @media (max-width: 768px) {
-        .navbar-nav {
-            text-align: center;
-        }
-        }
+    .btn-volver {
+        color: white;
+        border: 1px solid rgba(255,255,255,0.5);
+        padding: 5px 15px;
+        border-radius: 20px;
+        text-decoration: none;
+        font-size: 14px;
+        transition: 0.3s;
+    }
+    
+    .btn-volver:hover {
+        background: rgba(255,255,255,0.2);
+        color: white;
+    }
+    .btn-cancelar:hover {
+        background: rgba(255,255,255,0.2);
+        color: white;
+    }
             /*  */
         
         * {
@@ -32,12 +38,11 @@
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
         
-        body {
-            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #1a2a6c);
-            color: #333;
-            padding: 20px;
-            min-height: 100vh;
-        }
+         body {
+      background: #eef2f6;
+      font-family: 'Segoe UI', system-ui, sans-serif;
+    }
+
         
         .container {
             width: 98%;

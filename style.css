@@ -1,258 +1,203 @@
-/* style.css */
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap");
 
-/* Estilos generales */
-body {
-    background-color: #f8f9fa; /* Color de fondo */
-    font-family: Arial, sans-serif; /* Fuente general */
-    color: #343a40; /* Color del texto */
-}
-
-/* Estilo del contenedor del formulario */
-.form-container {
-    margin: 20px auto; /* Margen alrededor del contenedor */
-    max-width: 800px; /* Ancho máximo del contenedor */
-    padding: 20px; /* Espaciado interno */
-    border-radius: 8px; /* Bordes redondeados */
-    background-color: #ffffff; /* Fondo blanco para el formulario */
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* Sombra sutil */
-}
-
-/* Estilo del título principal */
-h1 {
-    color: #aa0b0b; /* Color del título */
-    text-align: center; /* Centrar el texto */
-    margin-bottom: 20px; /* Espaciado inferior */
-}
-
-/* Estilo de los encabezados de sección */
-.headline h2 {
-    color: #6c757d; /* Color de los encabezados de sección */
-    border-bottom: 2px solid  #aa0b0b; /* Línea inferior */
-    padding-bottom: 10px; /* Espaciado inferior */
-}
-
-/* Estilo de las etiquetas de los formularios */
-.form-label {
-    font-weight: bold; /* Negrita para las etiquetas */
-}
-
-/* Espaciado entre los grupos de entrada */
-.input-group {
-    margin-bottom: 15px; /* Espaciado entre los grupos de entrada */
-}
-
-/* Estilo para los botones de navegación */
-.navigation-buttons {
-    display: flex; /* Usar flexbox para alinear los botones */
-    justify-content: space-between; /* Espacio entre los botones */
-    margin-top: 20px; /* Espaciado superior */
-}
-
-/* Estilo para los botones */
-.btn {
-    width: 48%; /* Ancho de los botones */
-}
-
-/* Estilo de los módulos */
-.module {
-    display: none; /* Ocultar módulos por defecto */
-}
-
-.module.active {
-    display: block; /* Mostrar módulo activo */
-}
-
-/* Estilo de los campos de entrada */
-input.form-control,
-select.form-select,
-textarea.form-control {
-    border-radius: 4px; /* Bordes redondeados */
-    border: 1px solid #ced4da; /* Borde gris claro */
-}
-
-/* Estilo para los campos de entrada al enfocar */
-input.form-control:focus,
-select.form-select:focus,
-textarea.form-control:focus {
-    border-color:  #aa0b0b; /* Cambiar color del borde al enfocar */
-    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5); /* Sombra al enfocar */
-}
-
-/* Estilo para los mensajes de error (si es necesario) */
-.error-message {
-    color: red; /* Color rojo para mensajes de error */
-    font-size: 0.9em; /* Tamaño de fuente más pequeño */
-    margin-top: 5px; /* Espaciado superior */
-}
-
-body {
+* {
     margin: 0;
-    font-family: 'Roboto', sans-serif;
-    background: #f4f9fc;
-    color: #333;
-}
-
-.navbar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background: linear-gradient(90deg, #003366,  #aa0b0b);
-    padding: 10px 20px;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-}
-
-.logo-container {
-    display: flex;
-    align-items: center;
-}
-
-.logo {
-    height: 50px;
-    margin-right: 15px;
-}
-
-.titulo {
-    font-size: 1.5em;
-    color: white;
-    font-weight: bold;
-}
-
-.nav-links {
-    list-style: none;
-    display: flex;
-    gap: 20px;
-}
-
-.nav-links a {
-    color: white;
-    text-decoration: none;
-    font-weight: 500;
-    transition: color 0.3s ease;
-}
-
-.nav-links a:hover {
-    color: #ffccd5;
-}
-
-.cerrar-sesion {
-    background-color: #f44336;
-    padding: 5px 10px;
-    border-radius: 4px;
-}
-
-.cerrar-sesion:hover {
-    background-color: #d32f2f;
-}
-
-.contenido {
-    padding: 40px;
-    text-align: center;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Poppins", sans-serif;
 }
 
 body {
-    margin: 0;
-    font-family: Arial, sans-serif;
-    background: linear-gradient(to right,  #aa0b0b,  #aa0b0b);
+    background: #eef2f8; /* Un gris azulado muy limpio */
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 100vh;
-  }
-  
-  .login-container {
-    display: flex;
-    width: 900px;
-    border-radius: 20px;
-    overflow: hidden;
-    box-shadow: 0 0 20px rgba(0,0,0,0.2);
-    background: white;
-  }
-  
-  .form-section {
-    flex: 1;
+    min-height: 100vh;
+}
+
+/* Contenedor Principal */
+.main-container {
+    background: #fff;
+    width: 900px; /* Ancho fijo para escritorio */
+    height: 550px;
+    display: flex; /* Esto arregla que todo se vea mal, pone uno al lado del otro */
+    border-radius: 30px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+    overflow: hidden; /* Para que los bordes redondos recorten el contenido */
+}
+
+/* --- LADO IZQUIERDO (FORMULARIO) --- */
+.form-side {
+    width: 50%;
     padding: 40px;
-    background: #f8f8f8;
-  }
-  
-  .logo {
-    width: 120px;
-    display: block;
-    margin: 0 auto 20px;
-  }
-  
-  h2 {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.form-side form {
+    width: 100%;
+    max-width: 350px; /* Evita que los inputs sean gigantes */
+}
+
+.header-text {
     text-align: center;
     margin-bottom: 30px;
-  }
-  
-  label {
-    display: block;
-    margin-bottom: 5px;
-    font-weight: bold;
-  }
-  
-  input {
-    width: 100%;
-    padding: 10px;
+}
+
+.header-text h2 {
+    font-size: 32px;
+    color: #333;
+    font-weight: 700;
+}
+
+.header-text p {
+    font-size: 14px;
+    color: #666;
+    margin-top: 5px;
+}
+
+/* Inputs Estilizados */
+.input-wrapper {
+    position: relative;
     margin-bottom: 20px;
-    border: none;
-    border-bottom: 1px solid #ccc;
-    background: transparent;
-  }
-  
-  button {
     width: 100%;
-    padding: 12px;
-    background: linear-gradient(to right, #aa0b0b,  #aa0b0b);
-    color: white;
+}
+
+.input-wrapper input {
+    width: 100%;
+    padding: 15px 45px 15px 20px; /* Espacio para el icono a la derecha */
+    background: #f0f0f0;
     border: none;
-    cursor: pointer;
-    font-weight: bold;
-  }
-  
-  button:hover {
-    opacity: 0.9;
-  }
-  
-  .form-section p {
-    text-align: center;
-    margin-top: 10px;
-  }
-  
-  .form-section a {
-    color: #4433aa;
+    border-radius: 10px;
+    outline: none;
+    font-size: 15px;
+    color: #333;
+    transition: all 0.3s ease;
+}
+
+.input-wrapper input:focus {
+    background: #fff;
+    box-shadow: 0 0 0 2px #aa0b0b; /* Borde rojo al escribir */
+}
+
+.input-wrapper .icon {
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #888;
+    font-size: 18px;
+}
+
+.forgot-pass {
+    text-align: right;
+    margin-bottom: 25px;
+}
+
+.forgot-pass a {
+    color: #666;
+    font-size: 13px;
     text-decoration: none;
-  }
-  
-  .info-section {
-    flex: 1;
-    background: rgba(0, 0, 0, 0.1);
-    color: white;
+    transition: color 0.3s;
+}
+
+.forgot-pass a:hover {
+    color: #aa0b0b;
+}
+
+/* Botón Principal */
+.btn-login {
+    width: 100%;
+    padding: 15px;
+    background: linear-gradient(90deg, #aa0b0b, #8a0000); /* Rojo médico degradado */
+    color: #fff;
+    font-size: 16px;
+    font-weight: 600;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.btn-login:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(170, 11, 11, 0.4);
+}
+
+/* --- LADO DERECHO (DECORACIÓN) --- */
+.info-side {
+    width: 50%;
+    background: linear-gradient(135deg, #aa0b0b, #003366); /* Tu rojo y azul mezclados */
     display: flex;
     justify-content: center;
     align-items: center;
-    background: rgba(0, 0, 0, 0.1);
-    position: relative;
-    background-color: rgba(255, 255, 255, 0.1);
-  }
-  
-  .info-section h2 {
-    color: white;
     text-align: center;
-    font-size: 24px;
-    z-index: 2;
-  }
-  
-  .bg-logo {
-    background-image: url('icons/logo.png');
-    background-size: contain;
-    background-repeat: no-repeat;
-    background-position: center;
-    opacity: 0.1;
+    color: white;
+    position: relative;
+}
+
+/* Patrón de fondo sutil (opcional) */
+.info-side::before {
+    content: '';
     position: absolute;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    left: 0;
-  }
-  
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: url('icons/logo.png'); /* Usa tu logo como fondo repetido si quieres */
+    background-size: 200px;
+    opacity: 0.05;
+    pointer-events: none;
+}
+
+.overlay-content {
+    padding: 40px;
+    z-index: 2;
+}
+
+.logo-big {
+    width: 120px;
+    margin-bottom: 20px;
+    filter: drop-shadow(0 4px 6px rgba(0,0,0,0.2));
+    background: white; /* Círculo blanco detrás del logo si es transparente */
+    border-radius: 50%;
+    padding: 10px;
+}
+
+.info-side h1 {
+    font-size: 28px;
+    margin-bottom: 10px;
+    font-weight: 700;
+}
+
+.info-side p {
+    font-size: 16px;
+    opacity: 0.9;
+    line-height: 1.5;
+}
+
+/* --- RESPONSIVE (MÓVIL) --- */
+@media (max-width: 768px) {
+    .main-container {
+        flex-direction: column; /* Poner uno debajo del otro */
+        width: 90%;
+        height: auto;
+    }
+
+    .form-side, .info-side {
+        width: 100%;
+    }
+
+    .info-side {
+        padding: 30px;
+        order: -1; /* Pone el logo arriba del formulario en móvil */
+        border-radius: 30px 30px 0 0; /* Arregla las esquinas en móvil */
+    }
+    
+    .form-side {
+        border-radius: 0 0 30px 30px;
+    }
+    
+    .logo-big {
+        width: 80px;
+    }
+}

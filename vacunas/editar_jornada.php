@@ -55,7 +55,7 @@ foreach ($lotes as $lote) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sistema de Registro de Vacunación</title>
     <link rel="stylesheet" href="../bootstrap/css/bootstrap.min.css">
-    <link rel="stylesheet" href="registro_vacunas.css">
+    <link rel="stylesheet" href="registro_vacuna.css">
 </head>
 <body>
 
@@ -71,8 +71,7 @@ foreach ($lotes as $lote) {
         </button>
         <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
             <ul class="navbar-nav">
-            <li class="nav-item"><a class="nav-link" href="../dashboard.php">Inicio</a></li>
-            <li class="nav-item"><a class="nav-link" href="jornada.php">Atras</a></li>
+            <a class="btn-volver" href="jornada.php">← Atrás</a>
             </ul>
         </div>
         </div>

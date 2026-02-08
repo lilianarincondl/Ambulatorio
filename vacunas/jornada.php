@@ -1,4 +1,6 @@
 <?php
+// jornadas.php - Gestión de Jornadas de Vacunación
+
 // Configuración de la conexión a la base de datos
 $host = "localhost";
 $dbname = "ambulatorio";
@@ -14,11 +16,14 @@ try {
 }
 
 // Procesamiento de operaciones CRUD
+$mensaje = "";
 if (isset($_GET['eliminar'])) {
     $id = $_GET['eliminar'];
     $stmt = $pdo->prepare("DELETE FROM jornadas WHERE id = ?");
     if ($stmt->execute([$id])) {
-        $mensaje = "Registro eliminado correctamente";
+        // Redirigir para limpiar URL
+        header("Location: jornadas.php?msg=eliminado");
+        exit();
     }
 }
 
@@ -28,42 +33,31 @@ $parametro = [];
 $filtros = [];
 
 if (isset($_GET['buscar'])) {
-    // Filtro por día, mes y año
-    $filtro_dia = !empty($_GET['dia_busqueda']);
-    $filtro_mes = !empty($_GET['mes_busqueda']);
-    $filtro_anio = !empty($_GET['anio_busqueda']);
+    // Filtro por fecha
+    $dia = $_GET['dia_busqueda'] ?? '';
+    $mes = $_GET['mes_busqueda'] ?? '';
+    $anio = $_GET['anio_busqueda'] ?? '';
     
-    // Si se especifica día, debe tener mes y año
-    if ($filtro_dia && $filtro_mes && $filtro_anio) {
+    if ($dia && $mes && $anio) {
         $filtros[] = "DAY(fecha) = :dia AND MONTH(fecha) = :mes AND YEAR(fecha) = :anio";
-        $parametro[':dia'] = $_GET['dia_busqueda'];
-        $parametro[':mes'] = $_GET['mes_busqueda'];
-        $parametro[':anio'] = $_GET['anio_busqueda'];
-    } 
-    // Filtro por mes y año (sin día)
-    elseif ($filtro_mes && $filtro_anio) {
+        $parametro[':dia'] = $dia; $parametro[':mes'] = $mes; $parametro[':anio'] = $anio;
+    } elseif ($mes && $anio) {
         $filtros[] = "MONTH(fecha) = :mes AND YEAR(fecha) = :anio";
-        $parametro[':mes'] = $_GET['mes_busqueda'];
-        $parametro[':anio'] = $_GET['anio_busqueda'];
-    } 
-    // Filtro solo por mes
-    elseif ($filtro_mes) {
-        $filtros[] = "MONTH(fecha) = :mes";
-        $parametro[':mes'] = $_GET['mes_busqueda'];
-    } 
-    // Filtro solo por año
-    elseif ($filtro_anio) {
+        $parametro[':mes'] = $mes; $parametro[':anio'] = $anio;
+    } elseif ($anio) {
         $filtros[] = "YEAR(fecha) = :anio";
-        $parametro[':anio'] = $_GET['anio_busqueda'];
+        $parametro[':anio'] = $anio;
+    } elseif ($mes) {
+        $filtros[] = "MONTH(fecha) = :mes";
+        $parametro[':mes'] = $mes;
     }
     
-    // Filtro por texto (busca en establecimiento o responsables)
+    // Filtro por texto
     if (!empty($_GET['texto_busqueda'])) {
         $filtros[] = "(establecimiento LIKE :texto OR responsables LIKE :texto)";
         $parametro[':texto'] = '%' . $_GET['texto_busqueda'] . '%';
     }
     
-    // Combinar filtros
     if (!empty($filtros)) {
         $condicion = "WHERE " . implode(" AND ", $filtros);
     }
@@ -73,7 +67,7 @@ if (isset($_GET['buscar'])) {
 $sql = "SELECT * FROM jornadas $condicion ORDER BY fecha DESC";
 $stmt = $pdo->prepare($sql);
 $stmt->execute($parametro);
-$registros = $stmt->fetchAll(PDO::FETCH_ASSOC);
+$registros = $stmt->fetchAll();
 ?>
 
 <!DOCTYPE html>
@@ -81,212 +75,255 @@ $registros = $stmt->fetchAll(PDO::FETCH_ASSOC);
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestión de Jornadas</title>
-    <link rel="stylesheet" href="../bootstrap/css/bootstrap.min.css">
-    <style>
-        /* Barra de navegacion */
-        body { background-color: #FFFFFF; }
-        .navbar {
-        background-color: #aa0b0b;
-        padding: 0.6rem 1.2rem;
-        }
-
-        .navbar-brand,
-        .nav-link {
-        color: #fff !important;
-        font-weight: 500;
-        }
-
-        .nav-link:hover {
-        color: #cce5ff !important;
-        }
-
-        .navbar-toggler {
-        background-color: #ffffff;
-        }
-
-        .acciones-cell { width: 150px; }
+    <title>Jornadas de Vacunación</title>
     
-        /* Bordes más gruesos */
-        .table-bordered {
-            border-width: 2px !important;
+    <link rel="stylesheet" href="../bootstrap/css/bootstrap.min.css">
+    
+    <style>
+        /* --- ESTILOS GENERALES --- */
+        body {
+            background: #eef2f6;
+            font-family: 'Segoe UI', system-ui, sans-serif;
         }
-        .table-bordered th,
-        .table-bordered td {
-            border-width: 1px !important;
-            border-color: #212529 !important;
-        }
-        .table-bordered thead th {
-            border-bottom-width: 2px !important;
+
+        /* --- NAVBAR --- */
+        .navbar {
+            background: linear-gradient(90deg, #aa0b0b 0%, #003366 100%);
+            padding: 10px 0;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
         }
         
-        /* Texto centrado en toda la tabla */
-        .table th, .table td {
+        .navbar-brand {
+            font-weight: 600;
+            color: white !important;
+            font-size: 1.1rem;
+        }
+
+        .btn-volver {
+            color: white;
+            border: 1px solid rgba(255,255,255,0.5);
+            padding: 5px 15px;
+            border-radius: 20px;
+            text-decoration: none;
+            font-size: 14px;
+            transition: 0.3s;
+        }
+        .btn-volver:hover {
+            background: rgba(255,255,255,0.2);
+            color: white;
+        }
+
+        /* --- TARJETA PRINCIPAL --- */
+        .main-card {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+            padding: 30px;
+            margin-top: 30px;
+            margin-bottom: 30px;
+        }
+
+        /* --- BARRA DE FILTROS --- */
+        .filter-bar {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 15px;
+            border: 1px solid #eee;
+            margin-bottom: 25px;
+        }
+
+        .form-select-sm, .form-control-sm {
+            border-radius: 8px;
+            border: 1px solid #ced4da;
+        }
+
+        /* --- TABLA --- */
+        .table-container {
+            border-radius: 15px;
+            overflow: hidden;
+            border: 1px solid #eee;
+        }
+
+        .table thead {
+            background-color: #003366; /* Azul Médico */
+            color: white;
+        }
+
+        .table th {
+            font-weight: 500;
+            padding: 15px;
+            border: none;
             text-align: center;
+        }
+
+        .table td {
+            padding: 15px;
             vertical-align: middle;
+            color: #555;
+            text-align: center;
         }
-        
-        /* Scroll para el cuerpo de la tabla */
-        .tabla-contenedor {
-            max-height: 400px; /* Altura para 6 registros aprox */
-            overflow-y: auto;
+
+        .table-hover tbody tr:hover {
+            background-color: #f8f9fa;
         }
-        
-        /* Cabecera fija */
-        thead tr {
-            position: sticky;
-            top: 0;
-            background-color: white;
-            z-index: 10;
-            box-shadow: 0 2px 2px -1px rgba(0,0,0,0.1);
+
+        /* --- BOTONES ACCIÓN --- */
+        .btn-action {
+            width: 35px;
+            height: 35px;
+            border-radius: 8px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border: none;
+            transition: 0.2s;
+            text-decoration: none;
         }
-        
-        /* Estilo para los campos de búsqueda */
-        .campo-busqueda {
-            width: auto; /* Ancho automático */
-            margin-right: 5px;
-            margin-bottom: 5px;
+
+        .btn-edit { background: #fff3cd; color: #856404; }
+        .btn-edit:hover { background: #ffc107; color: black; }
+
+        .btn-delete { background: #ffebee; color: #aa0b0b; }
+        .btn-delete:hover { background: #aa0b0b; color: white; }
+
+        .badge-date {
+            background: #e3f2fd;
+            color: #003366;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.9rem;
         }
-        
-        /* Barra de texto más ancha */
-        .texto-busqueda {
-            width: 250px; /* Más ancho para texto */
-        }
-        
-        /* Select más angostos */
-        .dia-select, .mes-select, .anio-input {
-            width: 80px;
-        }
-        
-        /* Contenedor flexible para campos de fecha */
-        .filtros-fecha {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 5px;
-        }
+
     </style>
 </head>
 <body>
-    <!-- Barra de Navegación -->
-    <nav class="navbar navbar-expand-lg fixed-top shadow">
-        <div class="container-fluid">
-            <a class="navbar-brand d-flex align-items-center" href="#">
-                <img src="../icons/logo.png" alt="Logo Ambulatorio" style="height: 40px; margin-right: 10px;" />
-                Ambulatorio Urbano I Libertador
+
+    <nav class="navbar navbar-expand-lg fixed-top">
+        <div class="container-fluid px-4">
+            <a class="navbar-brand d-flex align-items-center gap-2" href="#">
+                <img src="../icons/logo.png" alt="Logo" style="height: 40px; background: white; border-radius: 50%; padding: 2px;" />
+                <span>Gestión de Jornadas</span>
             </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
-                <ul class="navbar-nav">
-                    <li class="nav-item"><a class="nav-link" href="../dashboard.php">Inicio</a></li>
-                </ul>
+            <div class="ms-auto">
+                <a class="btn-volver" href="../dashboard.php">← Volver al Inicio</a>
             </div>
         </div>
     </nav>
-    <!-- Espacio para que el contenido no quede debajo de la navbar fija -->
+
     <div style="height: 70px;"></div>
 
-    <div class="container mt-4">
-        <!-- BARRA DE BÚSQUEDA Y BOTÓN NUEVO -->
-        <div class="row mb-4">
-            <div class="col-md-8">
-                <form method="GET" class="d-flex flex-wrap align-items-center">
-                    <div class="filtros-fecha me-2 mb-2">
-                        <!-- Filtro por día -->
-                        <select name="dia_busqueda" class="form-select campo-busqueda dia-select">
+    <div class="container">
+        <div class="main-card">
+            
+            <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-3">
+                <div>
+                    <h2 style="color: #003366; font-weight: 700; margin: 0;">Jornadas de Vacunación</h2>
+                    <p class="text-muted m-0">Registro histórico de operativos realizados</p>
+                </div>
+                <a href="registrar_jornada.php" class="btn btn-danger" style="background: #aa0b0b; border: none; padding: 10px 20px; border-radius: 10px; font-weight: 500;">
+                    + Nueva Jornada
+                </a>
+            </div>
+
+            <div class="filter-bar">
+                <form method="GET" class="row g-2 align-items-center">
+                    <div class="col-auto fw-bold text-muted small">FILTRAR POR:</div>
+                    
+                    <div class="col-auto">
+                        <select name="dia_busqueda" class="form-select form-select-sm" style="width: 70px;">
                             <option value="">Día</option>
                             <?php for ($d = 1; $d <= 31; $d++): ?>
-                                <option value="<?= $d ?>" <?= isset($_GET['dia_busqueda']) && $_GET['dia_busqueda'] == $d ? 'selected' : '' ?>>
-                                    <?= $d ?>
-                                </option>
+                                <option value="<?= $d ?>" <?= isset($_GET['dia_busqueda']) && $_GET['dia_busqueda'] == $d ? 'selected' : '' ?>><?= $d ?></option>
                             <?php endfor; ?>
                         </select>
-                        
-                        <!-- Filtro por mes -->
-                        <select name="mes_busqueda" class="form-select campo-busqueda mes-select">
-                            <option value="">Mes</option>
-                            <option value="1" <?= isset($_GET['mes_busqueda']) && $_GET['mes_busqueda'] == '1' ? 'selected' : '' ?>>Ene</option>
-                            <option value="2" <?= isset($_GET['mes_busqueda']) && $_GET['mes_busqueda'] == '2' ? 'selected' : '' ?>>Feb</option>
-                            <option value="3" <?= isset($_GET['mes_busqueda']) && $_GET['mes_busqueda'] == '3' ? 'selected' : '' ?>>Mar</option>
-                            <option value="4" <?= isset($_GET['mes_busqueda']) && $_GET['mes_busqueda'] == '4' ? 'selected' : '' ?>>Abr</option>
-                            <option value="5" <?= isset($_GET['mes_busqueda']) && $_GET['mes_busqueda'] == '5' ? 'selected' : '' ?>>May</option>
-                            <option value="6" <?= isset($_GET['mes_busqueda']) && $_GET['mes_busqueda'] == '6' ? 'selected' : '' ?>>Jun</option>
-                            <option value="7" <?= isset($_GET['mes_busqueda']) && $_GET['mes_busqueda'] == '7' ? 'selected' : '' ?>>Jul</option>
-                            <option value="8" <?= isset($_GET['mes_busqueda']) && $_GET['mes_busqueda'] == '8' ? 'selected' : '' ?>>Ago</option>
-                            <option value="9" <?= isset($_GET['mes_busqueda']) && $_GET['mes_busqueda'] == '9' ? 'selected' : '' ?>>Sep</option>
-                            <option value="10" <?= isset($_GET['mes_busqueda']) && $_GET['mes_busqueda'] == '10' ? 'selected' : '' ?>>Oct</option>
-                            <option value="11" <?= isset($_GET['mes_busqueda']) && $_GET['mes_busqueda'] == '11' ? 'selected' : '' ?>>Nov</option>
-                            <option value="12" <?= isset($_GET['mes_busqueda']) && $_GET['mes_busqueda'] == '12' ? 'selected' : '' ?>>Dic</option>
-                        </select>
-                        
-                        <!-- Filtro por año -->
-                        <input type="number" name="anio_busqueda" min="2000" max="2099" step="1" 
-                               class="form-control campo-busqueda anio-input"
-                               placeholder="Año"
-                               value="<?= $_GET['anio_busqueda'] ?? '' ?>">
                     </div>
-                    
-                    <!-- Campo de búsqueda única para establecimiento y responsable -->
-                    <input type="text" name="texto_busqueda" class="form-control campo-busqueda texto-busqueda me-2 mb-2"
-                           placeholder="Buscar establecimiento o responsable" 
-                           value="<?= $_GET['texto_busqueda'] ?? '' ?>">
-                    
-                           <!-- Boton de limpiar busqueda -->
-                    <div class="d-flex mb-2">
-                        <button type="submit" name="buscar" class="btn btn-primary me-2">Buscar</button>
-                        <a href="?" class="btn btn-secondary">Limpiar</a>
+
+                    <div class="col-auto">
+                        <select name="mes_busqueda" class="form-select form-select-sm">
+                            <option value="">Mes</option>
+                            <option value="1" <?= ($_GET['mes_busqueda'] ?? '') == '1' ? 'selected' : '' ?>>Enero</option>
+                            <option value="2" <?= ($_GET['mes_busqueda'] ?? '') == '2' ? 'selected' : '' ?>>Febrero</option>
+                            <option value="3" <?= ($_GET['mes_busqueda'] ?? '') == '3' ? 'selected' : '' ?>>Marzo</option>
+                            <option value="4" <?= ($_GET['mes_busqueda'] ?? '') == '4' ? 'selected' : '' ?>>Abril</option>
+                            <option value="5" <?= ($_GET['mes_busqueda'] ?? '') == '5' ? 'selected' : '' ?>>Mayo</option>
+                            <option value="6" <?= ($_GET['mes_busqueda'] ?? '') == '6' ? 'selected' : '' ?>>Junio</option>
+                            <option value="7" <?= ($_GET['mes_busqueda'] ?? '') == '7' ? 'selected' : '' ?>>Julio</option>
+                            <option value="8" <?= ($_GET['mes_busqueda'] ?? '') == '8' ? 'selected' : '' ?>>Agosto</option>
+                            <option value="9" <?= ($_GET['mes_busqueda'] ?? '') == '9' ? 'selected' : '' ?>>Septiembre</option>
+                            <option value="10" <?= ($_GET['mes_busqueda'] ?? '') == '10' ? 'selected' : '' ?>>Octubre</option>
+                            <option value="11" <?= ($_GET['mes_busqueda'] ?? '') == '11' ? 'selected' : '' ?>>Noviembre</option>
+                            <option value="12" <?= ($_GET['mes_busqueda'] ?? '') == '12' ? 'selected' : '' ?>>Diciembre</option>
+                        </select>
+                    </div>
+
+                    <div class="col-auto">
+                        <input type="number" name="anio_busqueda" class="form-control form-select-sm" placeholder="Año" style="width: 80px;" value="<?= $_GET['anio_busqueda'] ?? '' ?>">
+                    </div>
+
+                    <div class="col">
+                        <input type="text" name="texto_busqueda" class="form-control form-select-sm" placeholder="Buscar lugar o responsable..." value="<?= $_GET['texto_busqueda'] ?? '' ?>">
+                    </div>
+
+                    <div class="col-auto">
+                        <button type="submit" name="buscar" class="btn btn-sm btn-primary px-3" style="background: #003366; border:none;">Buscar</button>
+                        <a href="jornadas.php" class="btn btn-sm btn-outline-secondary">Limpiar</a>
                     </div>
                 </form>
             </div>
-            <div class="col-md-4 text-end">
-                <a href="registrar_jornada.php" class="btn btn-success">Nueva Jornada</a>
-            </div>
-        </div>
 
-        <!-- TABLA DE REGISTROS CON SCROLL -->
-        <div class="contenedor-tabla">
-            <?php if (isset($mensaje)): ?>
-                <div class="alert alert-info"><?= $mensaje ?></div>
-            <?php endif; ?>
-            
-            <div class="tabla-contenedor">
-                <table class="table table-bordered table-striped">
-                    <thead>
-                        <tr>
-                            <th>Fecha</th>
-                            <th>Establecimiento</th>
-                            <th>Responsables</th>
-                            <th>Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php if (empty($registros)): ?>
+            <div class="table-container">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead>
                             <tr>
-                                <td colspan="4" class="text-center">No se encontraron registros</td>
+                                <th>Fecha</th>
+                                <th>Establecimiento / Lugar</th>
+                                <th>Responsables</th>
+                                <th style="width: 120px;">Acciones</th>
                             </tr>
-                        <?php else: ?>
-                            <?php foreach ($registros as $r): ?>
-                            <tr>
-                                <!-- Formatear fecha como día/mes/año -->
-                                <td><?= date('d/m/Y', strtotime($r['fecha'])) ?></td>
-                                <td><?= htmlspecialchars($r['establecimiento']) ?></td>
-                                <td><?= htmlspecialchars($r['responsables']) ?></td>
-                                <td class="acciones-cell">
-                                    <a href="editar_jornada.php?id=<?= $r['id'] ?>" class="btn btn-sm btn-warning">Editar</a>
-                                    <a href="?eliminar=<?= $r['id'] ?>" 
-                                       class="btn btn-sm btn-danger"
-                                       onclick="return confirm('¿Estás seguro de eliminar este registro?')">Eliminar</a>
-                                </td>
-                            </tr>
-                            <?php endforeach; ?>
-                        <?php endif; ?>
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                            <?php if (empty($registros)): ?>
+                                <tr>
+                                    <td colspan="4" class="text-center py-5 text-muted">
+                                        No se encontraron registros de jornadas.
+                                    </td>
+                                </tr>
+                            <?php else: ?>
+                                <?php foreach ($registros as $r): ?>
+                                <tr>
+                                    <td>
+                                        <span class="badge-date">
+                                            <?= date('d/m/Y', strtotime($r['fecha'])) ?>
+                                        </span>
+                                    </td>
+                                    <td style="font-weight: 500; text-align: left; padding-left: 20px;">
+                                        <?= htmlspecialchars($r['establecimiento']) ?>
+                                    </td>
+                                    <td style="text-align: left;">
+                                        <?= htmlspecialchars($r['responsables']) ?>
+                                    </td>
+                                    <td>
+                                        <a href="editar_jornada.php?id=<?= $r['id'] ?>" class="btn-action btn-edit me-1" title="Editar">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-10 10a.5.5 0 0 1-.168.11l-5 2a.5.5 0 0 1-.65-.65l2-5a.5.5 0 0 1 .11-.168l10-10zM11.207 2.5 13.5 4.793 14.793 3.5 12.5 1.207 11.207 2.5zm1.586 3L10.5 3.207 4 9.707V10h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.293l6.5-6.5zm-9.761 5.175-.106.106-1.528 3.821 3.821-1.528.106-.106A.5.5 0 0 1 5 12.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.468-.325z"/></svg>
+                                        </a>
+                                        <a href="jornadas.php?eliminar=<?= $r['id'] ?>" class="btn-action btn-delete" 
+                                           onclick="return confirm('¿Estás seguro de eliminar esta jornada?')" title="Eliminar">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5Zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5Zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6Z"/><path d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1ZM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118ZM2.5 3h11V2h-11v1Z"/></svg>
+                                        </a>
+                                    </td>
+                                </tr>
+                                <?php endforeach; ?>
+                            <?php endif; ?>
+                        </tbody>
+                    </table>
+                </div>
             </div>
+
         </div>
     </div>
 
-    <script src="../bootstrap/js/bootstrap.min.js"></script>
+    <script src="../bootstrap/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
