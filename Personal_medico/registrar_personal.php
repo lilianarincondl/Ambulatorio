@@ -13,9 +13,10 @@ if (isset($_SESSION['registro_error'])) {
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Registrar Médico | Ambulatorio</title>
+  <title>Registrar Personal | Ambulatorio</title>
   
   <link rel="stylesheet" href="../bootstrap/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
   <style>
     /* --- ESTILO GENERAL (Igual al Dashboard) --- */
@@ -64,14 +65,14 @@ if (isset($_SESSION['registro_error'])) {
         font-size: 0.9rem;
     }
 
-    .form-control {
+    .form-control, .form-select {
         border-radius: 10px;
         padding: 12px 15px;
         border: 1px solid #dee2e6;
         background-color: #f8f9fa;
     }
 
-    .form-control:focus {
+    .form-control:focus, .form-select:focus {
         background-color: #fff;
         border-color: #aa0b0b;
         box-shadow: 0 0 0 3px rgba(170, 11, 11, 0.1);
@@ -87,6 +88,7 @@ if (isset($_SESSION['registro_error'])) {
         font-weight: 600;
         transition: 0.3s;
         width: 100%;
+        display: block;
     }
     .btn-guardar:hover { background: #8a0000; color: white; }
 
@@ -100,7 +102,7 @@ if (isset($_SESSION['registro_error'])) {
         transition: 0.3s;
         width: 100%;
         text-decoration: none;
-        display: inline-block;
+        display: block;
         text-align: center;
     }
     .btn-cancelar:hover { background: #dee2e6; color: #333; }
@@ -125,8 +127,8 @@ if (isset($_SESSION['registro_error'])) {
         
         <div class="form-header">
             <img src="../icons/afiliado.png" alt="Icono" style="width: 60px; margin-bottom: 15px;">
-            <h2>Nuevo Médico</h2>
-            <p class="text-muted">Complete la información para registrar un nuevo usuario en el sistema.</p>
+            <h2>Nuevo Miembro del Personal</h2>
+            <p class="text-muted">Registre médicos, enfermeras o administrativos.</p>
         </div>
 
         <?php if ($mensaje): ?>
@@ -137,9 +139,10 @@ if (isset($_SESSION['registro_error'])) {
 
         <div id="alertaJS" class="alert alert-warning text-center d-none shadow-sm border-0" style="border-radius: 10px;"></div>
 
-        <form action="guardar.php" method="post" onsubmit="return validarFormulario()">
+        <form action="guardar_personal.php" method="post" onsubmit="return validarFormulario()">
             
             <div class="row g-3">
+                
                 <div class="col-md-6">
                     <div class="mb-3">
                         <label for="nombre" class="form-label">Nombre Completo</label>
@@ -155,6 +158,32 @@ if (isset($_SESSION['registro_error'])) {
                         <label for="correo" class="form-label">Correo Electrónico</label>
                         <input type="email" class="form-control" name="correo" id="correo" placeholder="correo@ejemplo.com" required>
                     </div>
+
+                    <div class="mb-3">
+                        <label for="cargo" class="form-label">Cargo / Especialidad</label>
+                        <select name="cargo" id="cargo" class="form-control form-select" required>
+                            <option value="">-- Seleccione --</option>
+                            <optgroup label="Personal Médico">
+                                <option value="Médico General">Médico General</option>
+                                <option value="Pediatra">Pediatra</option>
+                                <option value="Cardiólogo">Cardiólogo</option>
+                                <option value="Ginecóloga">Ginecóloga</option>
+                                <option value="Odontólogo">Odontólogo</option>
+                            </optgroup>
+                            <optgroup label="Enfermería">
+                                <option value="Enfermera Jefe">Enfermera Jefe</option>
+                                <option value="Enfermera">Enfermera</option>
+                            </optgroup>
+                            <optgroup label="Administrativo (No sale en citas)">
+                                <option value="Admin. Archivo">Admin. Archivo</option>
+                                <option value="Admin. Recepción">Admin. Recepción</option>
+                                <option value="Admin. General">Admin. General</option>
+                            </optgroup>
+                        </select>
+                        <small class="text-muted" style="font-size: 0.75rem;">
+                            * Seleccione "Admin..." para que no aparezca en la lista de médicos.
+                        </small>
+                    </div>
                 </div>
 
                 <div class="col-md-6">
@@ -168,10 +197,11 @@ if (isset($_SESSION['registro_error'])) {
                         <input type="password" class="form-control" name="confirmar" id="confirmar" placeholder="Repita la contraseña" required>
                     </div>
                     
-                    <div class="mt-4 p-3 bg-light rounded text-muted small">
+                    <div class="mt-4 p-3 bg-light rounded text-muted small border">
                         <ul class="mb-0 ps-3">
-                            <li>La contraseña debe ser segura.</li>
+                            <li>La contraseña debe ser segura (mín. 4 caracteres).</li>
                             <li>Verifique que el correo sea correcto.</li>
+                            <li>El cargo define los permisos del usuario.</li>
                         </ul>
                     </div>
                 </div>
@@ -195,6 +225,7 @@ if (isset($_SESSION['registro_error'])) {
   <script>
     function validarFormulario() {
       var nombre = document.getElementById('nombre').value.trim();
+      var cargo = document.getElementById('cargo').value;
       var pass = document.getElementById('password').value;
       var conf = document.getElementById('confirmar').value;
       var alerta = document.getElementById('alertaJS');
@@ -203,9 +234,16 @@ if (isset($_SESSION['registro_error'])) {
       alerta.classList.add('d-none');
       document.getElementById('password').classList.remove('is-invalid');
       document.getElementById('confirmar').classList.remove('is-invalid');
+      document.getElementById('cargo').classList.remove('is-invalid');
 
       if (!nombre) {
         mostrarAlerta('Por favor, ingrese el nombre completo.');
+        return false;
+      }
+
+      if (cargo === "") {
+        mostrarAlerta('Debe seleccionar un Cargo o Especialidad.');
+        document.getElementById('cargo').classList.add('is-invalid');
         return false;
       }
 
@@ -216,7 +254,7 @@ if (isset($_SESSION['registro_error'])) {
         return false;
       }
 
-      if (pass.length < 4) { // Validación simple de longitud
+      if (pass.length < 4) { 
         mostrarAlerta('La contraseña es muy corta (mínimo 4 caracteres).');
         return false;
       }
@@ -226,7 +264,7 @@ if (isset($_SESSION['registro_error'])) {
 
     function mostrarAlerta(mensaje) {
         var alerta = document.getElementById('alertaJS');
-        alerta.textContent = mensaje;
+        alerta.innerHTML = '<i class="fa-solid fa-triangle-exclamation me-2"></i> ' + mensaje;
         alerta.classList.remove('d-none');
         // Auto-ocultar después de 4 segundos
         setTimeout(function(){ alerta.classList.add('d-none'); }, 4000);

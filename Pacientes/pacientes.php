@@ -5,8 +5,9 @@ session_start();
 // Conexión
 $conn = new mysqli('localhost', 'root', '', 'ambulatorio');
 if ($conn->connect_error) { die("Conexión fallida: " . $conn->connect_error); }
+$conn->set_charset("utf8");
 
-// Lógica de Borrado (Antes de mostrar nada)
+// Lógica de Borrado
 if (isset($_GET['borrar'])) {
     $id_borrar = base64_decode($_GET['borrar']);
     $id_borrar = intval($id_borrar);
@@ -17,19 +18,37 @@ if (isset($_GET['borrar'])) {
         $stmt->execute();
         $stmt->close();
     }
-    // Redirección limpia
     header("Location: pacientes.php");
     exit();
 }
 
-// Lógica de Búsqueda
+// --- PAGINACIÓN Y BÚSQUEDA ---
+
+// 1. Configuración
+$registros_por_pagina = 10; // Puedes cambiar esto a 15 o 20 si prefieres
+$pagina_actual = isset($_GET['pagina']) ? (int)$_GET['pagina'] : 1;
+if ($pagina_actual < 1) $pagina_actual = 1;
+
+$inicio = ($pagina_actual - 1) * $registros_por_pagina;
+
+// 2. Preparar el WHERE para la búsqueda
 $where = "";
+$param_busqueda = ""; // Para mantener la búsqueda en los enlaces de paginación
 if (!empty($_GET['busqueda'])) {
     $busqueda = $conn->real_escape_string($_GET['busqueda']);
     $where = "WHERE nombres LIKE '%$busqueda%' OR apellidos LIKE '%$busqueda%' OR cedula LIKE '%$busqueda%'";
+    $param_busqueda = "&busqueda=" . urlencode($_GET['busqueda']);
 }
 
-$sql = "SELECT * FROM pacientes $where ORDER BY id DESC LIMIT 10";
+// 3. Contar el TOTAL de registros (Para saber cuántas páginas crear)
+$sql_total = "SELECT COUNT(*) as total FROM pacientes $where";
+$resultado_total = $conn->query($sql_total);
+$fila_total = $resultado_total->fetch_assoc();
+$total_registros = $fila_total['total'];
+$total_paginas = ceil($total_registros / $registros_por_pagina);
+
+// 4. Consulta LIMITADA (Solo trae los de la página actual)
+$sql = "SELECT * FROM pacientes $where ORDER BY id DESC LIMIT $inicio, $registros_por_pagina";
 $result = $conn->query($sql);
 ?>
 
@@ -44,107 +63,45 @@ $result = $conn->query($sql);
 
   <style>
     /* --- ESTILO GENERAL --- */
-    body {
-      background: #eef2f6;
-      font-family: 'Segoe UI', system-ui, sans-serif;
-    }
+    body { background: #eef2f6; font-family: 'Segoe UI', system-ui, sans-serif; }
 
     /* --- NAVBAR --- */
-    .navbar {
-      background: linear-gradient(90deg, #aa0b0b 0%, #003366 100%);
-      padding: 10px 0;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-    }
+    .navbar { background: linear-gradient(90deg, #aa0b0b 0%, #003366 100%); padding: 10px 0; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+    .navbar-brand { font-weight: 600; color: white !important; font-size: 1.1rem; }
     
-    .navbar-brand {
-      font-weight: 600;
-      color: white !important;
-      font-size: 1.1rem;
-    }
-
     .btn-volver {
-        color: white;
-        border: 1px solid rgba(255,255,255,0.5);
-        padding: 5px 15px;
-        border-radius: 20px;
-        text-decoration: none;
-        font-size: 14px;
-        transition: 0.3s;
+        color: white; border: 1px solid rgba(255,255,255,0.5); padding: 5px 15px;
+        border-radius: 20px; text-decoration: none; font-size: 14px; transition: 0.3s;
     }
-    .btn-volver:hover {
-        background: rgba(255,255,255,0.2);
-        color: white;
-    }
+    .btn-volver:hover { background: rgba(255,255,255,0.2); color: white; }
 
     /* --- TARJETA PRINCIPAL --- */
     .main-card {
-      background: white;
-      border-radius: 20px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.05);
-      padding: 30px;
-      margin-top: 30px;
-      margin-bottom: 30px;
+      background: white; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+      padding: 30px; margin-top: 30px; margin-bottom: 30px;
     }
 
     /* --- TABLA --- */
-    .table-container {
-        border-radius: 15px;
-        overflow: hidden;
-        border: 1px solid #eee;
-    }
-
-    .table thead {
-        background-color: #003366; /* Azul Médico */
-        color: white;
-    }
-
-    .table th {
-        font-weight: 500;
-        padding: 15px;
-        border: none;
-    }
-
-    .table td {
-        padding: 15px;
-        vertical-align: middle;
-        color: #555;
-    }
-
-    .table-hover tbody tr:hover {
-        background-color: #f8f9fa;
-    }
+    .table-container { border-radius: 15px; overflow: hidden; border: 1px solid #eee; }
+    .table thead { background-color: #003366; color: white; }
+    .table th { font-weight: 500; padding: 15px; border: none; }
+    .table td { padding: 15px; vertical-align: middle; color: #555; }
+    .table-hover tbody tr:hover { background-color: #f8f9fa; }
 
     /* --- BOTONES ACCIÓN --- */
-    .btn-action {
-        width: 35px;
-        height: 35px;
-        border-radius: 8px;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        border: none;
-        transition: 0.2s;
-        text-decoration: none;
-    }
-
+    .btn-action { width: 35px; height: 35px; border-radius: 8px; display: inline-flex; align-items: center; justify-content: center; border: none; transition: 0.2s; text-decoration: none; }
     .btn-edit { background: #e3f2fd; color: #003366; }
     .btn-edit:hover { background: #003366; color: white; }
-
     .btn-delete { background: #ffebee; color: #aa0b0b; }
     .btn-delete:hover { background: #aa0b0b; color: white; }
 
     /* Buscador */
-    .search-input {
-        border-radius: 20px 0 0 20px;
-        border: 1px solid #ced4da;
-        padding-left: 20px;
-    }
-    .btn-search {
-        border-radius: 0 20px 20px 0;
-        background: #003366;
-        color: white;
-        border: none;
-    }
+    .search-input { border-radius: 20px 0 0 20px; border: 1px solid #ced4da; padding-left: 20px; }
+    .btn-search { border-radius: 0 20px 20px 0; background: #003366; color: white; border: none; }
+    
+    /* Paginación Personalizada */
+    .page-link { color: #003366; }
+    .page-item.active .page-link { background-color: #003366; border-color: #003366; }
   </style>
 </head>
 <body>
@@ -152,7 +109,7 @@ $result = $conn->query($sql);
   <nav class="navbar navbar-expand-lg fixed-top">
     <div class="container-fluid px-4">
       <a class="navbar-brand d-flex align-items-center gap-2" href="#">
-        <img src="../icons/logo.png" alt="Logo" style="height: 40px; background: white; border-radius: 50%; padding: 2px;" />
+        <img src="../icons/logo.png" alt="Logo" style="height: 40px; background: white; border-radius: 50%; padding: 2px;" onerror="this.style.display='none'"/>
         <span>Gestión de Pacientes</span>
       </a>
       
@@ -170,7 +127,10 @@ $result = $conn->query($sql);
       <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-3">
           <div>
               <h2 style="color: #003366; font-weight: 700; margin: 0;">Lista de Pacientes</h2>
-              <p class="text-muted m-0">Registro y control de historias médicas</p>
+              <p class="text-muted m-0">
+                  Mostrando página <?php echo $pagina_actual; ?> de <?php echo $total_paginas; ?> 
+                  (Total: <?php echo $total_registros; ?> pacientes)
+              </p>
           </div>
           <a href="registro_pacientes.php" class="btn btn-danger" style="background: #aa0b0b; border: none; padding: 10px 20px; border-radius: 10px; font-weight: 500;">
             + Nuevo Paciente
@@ -207,7 +167,9 @@ $result = $conn->query($sql);
               <tbody>
                 <?php
                 if ($result && $result->num_rows > 0) {
-                  $contador = 1;
+                  // Ajustar el contador para que siga la numeración en la pagina 2, 3...
+                  $contador = $inicio + 1; 
+                  
                   while ($row = $result->fetch_assoc()) {
                     $id_cifrado = base64_encode($row['id']);
                 ?>
@@ -238,7 +200,30 @@ $result = $conn->query($sql);
         </div>
       </div>
 
-    </div>
+      <?php if($total_paginas > 1): ?>
+      <div class="mt-4 d-flex justify-content-center">
+          <nav aria-label="Navegación de pacientes">
+              <ul class="pagination">
+                  
+                  <li class="page-item <?php echo ($pagina_actual <= 1) ? 'disabled' : ''; ?>">
+                      <a class="page-link" href="?pagina=<?php echo $pagina_actual - 1; ?><?php echo $param_busqueda; ?>">Anterior</a>
+                  </li>
+
+                  <?php for($i = 1; $i <= $total_paginas; $i++): ?>
+                      <li class="page-item <?php echo ($i == $pagina_actual) ? 'active' : ''; ?>">
+                          <a class="page-link" href="?pagina=<?php echo $i; ?><?php echo $param_busqueda; ?>"><?php echo $i; ?></a>
+                      </li>
+                  <?php endfor; ?>
+
+                  <li class="page-item <?php echo ($pagina_actual >= $total_paginas) ? 'disabled' : ''; ?>">
+                      <a class="page-link" href="?pagina=<?php echo $pagina_actual + 1; ?><?php echo $param_busqueda; ?>">Siguiente</a>
+                  </li>
+                  
+              </ul>
+          </nav>
+      </div>
+      <?php endif; ?>
+      </div>
   </div>
 
   <script src="../bootstrap/js/bootstrap.bundle.min.js"></script>

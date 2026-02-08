@@ -22,8 +22,8 @@ if ($id <= 1) {
     exit();
 }
 
-// Consultar datos actuales
-$stmt = $conn->prepare("SELECT nombre, correo, cedula FROM usuario_medico WHERE id = ?");
+// Consultar datos actuales (AGREGAMOS 'cargo' A LA CONSULTA)
+$stmt = $conn->prepare("SELECT nombre, correo, cedula, cargo FROM usuario_medico WHERE id = ?");
 $stmt->bind_param("i", $id);
 $stmt->execute();
 $stmt->store_result();
@@ -35,7 +35,8 @@ if ($stmt->num_rows === 0) {
     exit();
 }
 
-$stmt->bind_result($nombre, $correo, $cedula);
+// Vinculamos resultados a variables
+$stmt->bind_result($nombre, $correo, $cedula, $cargo_actual);
 $stmt->fetch();
 $stmt->close();
 ?>
@@ -45,9 +46,10 @@ $stmt->close();
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Editar Médico | Ambulatorio</title>
+  <title>Editar Personal | Ambulatorio</title>
   
   <link rel="stylesheet" href="../bootstrap/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
   <style>
     /* --- ESTILOS GENERALES (Coherentes con el resto) --- */
@@ -99,20 +101,20 @@ $stmt->close();
         font-size: 0.9rem;
     }
 
-    .form-control {
+    .form-control, .form-select {
         border-radius: 10px;
         padding: 12px 15px;
         border: 1px solid #dee2e6;
         background-color: #f8f9fa;
     }
 
-    .form-control:focus {
+    .form-control:focus, .form-select:focus {
         background-color: #fff;
         border-color: #aa0b0b;
         box-shadow: 0 0 0 3px rgba(170, 11, 11, 0.1);
     }
 
-    /* --- SECCIÓN CONTRASEÑA (Visualmente separada) --- */
+    /* --- SECCIÓN CONTRASEÑA --- */
     .password-section {
         background-color: #fff9fa; /* Fondo rojizo muy muy suave */
         border: 1px dashed #eecdd2;
@@ -132,7 +134,7 @@ $stmt->close();
 
     /* --- BOTONES --- */
     .btn-guardar {
-        background: #003366; /* Azul para editar (diferente al rojo de crear) */
+        background: #003366; /* Azul para editar */
         color: white;
         border: none;
         padding: 12px 30px;
@@ -140,6 +142,7 @@ $stmt->close();
         font-weight: 600;
         width: 100%;
         transition: 0.3s;
+        display: block;
     }
     .btn-guardar:hover { background: #002244; color: white; }
 
@@ -152,7 +155,7 @@ $stmt->close();
         font-weight: 600;
         width: 100%;
         text-decoration: none;
-        display: inline-block;
+        display: block;
         text-align: center;
         transition: 0.3s;
     }
@@ -178,16 +181,17 @@ $stmt->close();
         
         <div class="form-header">
             <h2>Editar Datos</h2>
-            <p class="text-muted m-0">Actualiza la información del médico seleccionado</p>
+            <p class="text-muted m-0">Actualiza la información del médico o personal seleccionado</p>
         </div>
 
         <div id="alertaJS" class="alert alert-warning text-center d-none shadow-sm border-0" style="border-radius: 10px;"></div>
 
-        <form action="actualizar.php" method="POST" autocomplete="off" onsubmit="return validarFormularioEditar()">
+        <form action="actualizar_personal.php" method="POST" autocomplete="off" onsubmit="return validarFormularioEditar()">
             
             <input type="hidden" name="id" value="<?php echo base64_encode($id); ?>">
 
             <div class="row g-3">
+                
                 <div class="col-md-6">
                     <div class="mb-3">
                         <label for="nombre" class="form-label">Nombre Completo</label>
@@ -202,6 +206,32 @@ $stmt->close();
                     <div class="mb-3">
                         <label for="correo" class="form-label">Correo Electrónico</label>
                         <input type="email" class="form-control" id="correo" name="correo" value="<?php echo htmlspecialchars($correo); ?>" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="cargo" class="form-label">Cargo / Especialidad</label>
+                        <select name="cargo" id="cargo" class="form-control form-select" required>
+                            <option value="">-- Seleccione --</option>
+                            
+                            <optgroup label="Personal Médico">
+                                <option value="Médico General" <?php if($cargo_actual=="Médico General") echo "selected"; ?>>Médico General</option>
+                                <option value="Pediatra"       <?php if($cargo_actual=="Pediatra") echo "selected"; ?>>Pediatra</option>
+                                <option value="Cardiólogo"     <?php if($cargo_actual=="Cardiólogo") echo "selected"; ?>>Cardiólogo</option>
+                                <option value="Ginecóloga"     <?php if($cargo_actual=="Ginecóloga") echo "selected"; ?>>Ginecóloga</option>
+                                <option value="Odontólogo"     <?php if($cargo_actual=="Odontólogo") echo "selected"; ?>>Odontólogo</option>
+                            </optgroup>
+                            
+                            <optgroup label="Enfermería">
+                                <option value="Enfermera Jefe" <?php if($cargo_actual=="Enfermera Jefe") echo "selected"; ?>>Enfermera Jefe</option>
+                                <option value="Enfermera"      <?php if($cargo_actual=="Enfermera") echo "selected"; ?>>Enfermera</option>
+                            </optgroup>
+                            
+                            <optgroup label="Administrativo">
+                                <option value="Admin. Archivo"   <?php if($cargo_actual=="Admin. Archivo") echo "selected"; ?>>Admin. Archivo</option>
+                                <option value="Admin. Recepción" <?php if($cargo_actual=="Admin. Recepción") echo "selected"; ?>>Admin. Recepción</option>
+                                <option value="Admin. General"   <?php if($cargo_actual=="Admin. General") echo "selected"; ?>>Admin. General</option>
+                            </optgroup>
+                        </select>
                     </div>
                 </div>
 
@@ -247,6 +277,7 @@ $stmt->close();
       var nombre = document.getElementById('nombre').value.trim();
       var correo = document.getElementById('correo').value.trim();
       var cedula = document.getElementById('cedula').value.trim();
+      var cargo = document.getElementById('cargo').value;
       
       var clave = document.getElementById('clave').value;
       var confirmar = document.getElementById('confirmar_clave').value;
@@ -257,13 +288,20 @@ $stmt->close();
       alerta.classList.add('d-none');
       document.getElementById('clave').classList.remove('is-invalid');
       document.getElementById('confirmar_clave').classList.remove('is-invalid');
+      document.getElementById('cargo').classList.remove('is-invalid');
 
       if (!nombre || !correo || !cedula) {
         mostrarAlerta('Los campos de nombre, cédula y correo son obligatorios.');
         return false;
       }
 
-      // Solo validar contraseñas si el usuario escribió algo en el campo "Nueva Contraseña"
+      if (cargo === "") {
+        mostrarAlerta('Debe seleccionar un Cargo válido.');
+        document.getElementById('cargo').classList.add('is-invalid');
+        return false;
+      }
+
+      // Solo validar contraseñas si el usuario escribió algo
       if (clave !== '') {
           if (clave !== confirmar) {
             mostrarAlerta('Las nuevas contraseñas no coinciden.');
@@ -282,7 +320,7 @@ $stmt->close();
 
     function mostrarAlerta(mensaje) {
         var alerta = document.getElementById('alertaJS');
-        alerta.textContent = mensaje;
+        alerta.innerHTML = '<i class="fa-solid fa-circle-exclamation me-2"></i> ' + mensaje;
         alerta.classList.remove('d-none');
         setTimeout(function(){ alerta.classList.add('d-none'); }, 4000);
     }
