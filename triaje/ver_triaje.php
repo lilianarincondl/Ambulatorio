@@ -48,7 +48,19 @@ if (!$triaje) {
         .bg-rojo { background-color: #dc3545; }
         .bg-naranja { background-color: #fd7e14; }
         .bg-verde { background-color: #198754; }
-        @media print { .no-print { display: none; } }
+        
+        .prioridad-box {
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+            color: white !important;
+        }
+
+        @media print {
+            body { padding-top: 0; background: white; }
+            .no-print, .navbar, .btn { display: none !important; }
+            .container { width: 100%; max-width: 100%; margin: 0; }
+            .card { box-shadow: none; border: 1px solid #eee; }
+        }
     </style>
 </head>
 <body>
@@ -73,13 +85,17 @@ if (!$triaje) {
                 <div class="card-header bg-white fw-bold">Información del Paciente</div>
                 <div class="card-body">
                     <div class="row">
-                        <div class="col-md-6">
+                        <div class="col-md-5">
                             <div class="info-label">Nombre Completo</div>
                             <div class="info-value"><?= htmlspecialchars($triaje['nombres'] . ' ' . $triaje['apellidos']) ?></div>
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-md-4">
                             <div class="info-label">Cédula</div>
                             <div class="info-value"><?= htmlspecialchars($triaje['cedula']) ?></div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="info-label">Edad</div>
+                            <div class="info-value"><?= $triaje['edad'] ?: 'N/A' ?> años</div>
                         </div>
                     </div>
                 </div>
@@ -123,7 +139,7 @@ if (!$triaje) {
                 <div class="card-header bg-white fw-bold">Reporte Clínico</div>
                 <div class="card-body">
                     <div class="info-label">Motivo de Consulta</div>
-                    <p class="info-value text-muted"><?= nl2br(htmlspecialchars($triaje['motivo_consulta'])) ?></p>
+                    <p class="info-value text-muted"><?= nl2br(htmlspecialchars($triaje['motivo_consulta'] ?: 'Ninguna registrada')) ?></p>
                     
                     <div class="info-label">Observaciones / Alarma</div>
                     <p class="info-value text-muted"><?= nl2br(htmlspecialchars($triaje['observaciones'] ?: 'Ninguna registrada')) ?></p>
@@ -133,7 +149,7 @@ if (!$triaje) {
 
         <div class="col-md-4">
             <div class="card mb-4">
-                <div class="card-header bg-white fw-bold">Clasificación de Triage</div>
+                <div class="card-header bg-white fw-bold">Clasificación de Triaje</div>
                 <div class="card-body">
                     <?php 
                         $prioridad = $triaje['prioridad_final'] ?: $triaje['prioridad_calculada'];
