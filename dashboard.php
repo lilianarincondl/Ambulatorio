@@ -132,7 +132,7 @@ $nombre_usuario = isset($_SESSION['nombre_usu']) ? $_SESSION['nombre_usu'] : 'Us
       justify-content: center;
       margin-bottom: 20px;
       transition: background 0.3s;
-      font-size: 32px; /* Tamaño para iconos de texto o SVG */
+      font-size: 32px; 
       color: #003366;
     }
 
@@ -195,9 +195,11 @@ $nombre_usuario = isset($_SESSION['nombre_usu']) ? $_SESSION['nombre_usu'] : 'Us
   </div>
 
   <div class="container dashboard-container">
+    <!-- Se mantiene el justificado al centro -->
     <div class="row g-4 justify-content-center">
       
-      <div class="col-6 col-md-4 col-lg-4">
+      <!-- Módulo 1 -->
+      <div class="col-12 col-sm-6 col-md-6 col-lg-5">
         <a href="Personal_medico/personal.php" class="card-link">
           <div class="card-menu">
             <div class="icon-wrapper">
@@ -208,7 +210,8 @@ $nombre_usuario = isset($_SESSION['nombre_usu']) ? $_SESSION['nombre_usu'] : 'Us
         </a>
       </div>
 
-      <div class="col-6 col-md-4 col-lg-4">
+      <!-- Módulo 2 -->
+      <div class="col-12 col-sm-6 col-md-6 col-lg-5">
         <a href="Pacientes/pacientes.php" class="card-link">
           <div class="card-menu">
             <div class="icon-wrapper">
@@ -219,34 +222,24 @@ $nombre_usuario = isset($_SESSION['nombre_usu']) ? $_SESSION['nombre_usu'] : 'Us
         </a>
       </div>
 
-      <div class="col-6 col-md-4 col-lg-4">
+      <!-- Módulo 3 -->
+      <div class="col-12 col-sm-6 col-md-6 col-lg-5">
         <a href="vacunas/jornada.php" class="card-link">
           <div class="card-menu">
             <div class="icon-wrapper">
               <img src="icons/unidad_medica.png" alt="Vacunas" onerror="this.style.display='none'; this.parentElement.innerHTML='💉';"/>
             </div>
-            <h5>Vacunas</h5>
+            <h5>Jornadas de Vacunaciones</h5>
           </div>
         </a>
       </div>
 
-      <div class="col-6 col-md-4 col-lg-4">
-        <a href="triaje/triaje.php" class="card-link">
-          <div class="card-menu">
-            <div class="icon-wrapper">
-              <img src="icons/control_medico.png" alt="Triaje" onerror="this.style.display='none'; this.parentElement.innerHTML='📋';"/>
-            </div>
-            <h5>Triaje</h5>
-          </div>
-        </a>
-      </div>
-
-      <div class="col-6 col-md-4 col-lg-4">
+      <!-- Módulo 4 -->
+      <div class="col-12 col-sm-6 col-md-6 col-lg-5">
         <a href="Citas/citas.php" class="card-link">
           <div class="card-menu">
             <div class="icon-wrapper">
                 <img src="icons/citas.png" alt="Triaje" onerror="this.style.display='none'; this.parentElement.innerHTML='📋';"/>
-                </svg>
             </div>
             <h5>Citas Médicas</h5>
           </div>

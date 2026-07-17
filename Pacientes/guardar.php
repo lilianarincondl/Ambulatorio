@@ -13,7 +13,7 @@ if ($conn->connect_error) {
 }
 
 // Recibe datos del formulario
-
+$numero_historia = isset($_POST['numero_historia']) ? trim($_POST['numero_historia']) : '';
 $cedula = isset($_POST['cedula']) ? trim($_POST['cedula']) : '';
 $apellidos = isset($_POST['apellidos']) ? trim($_POST['apellidos']) : '';
 $nombres = isset($_POST['nombres']) ? trim($_POST['nombres']) : '';
@@ -50,9 +50,9 @@ if ($mensaje !== '') {
     exit();
 }
 
-// Prepara e inserta el nuevo paciente (solo los campos válidos)
-$stmt = $conn->prepare("INSERT INTO pacientes (cedula, apellidos, nombres, ocupacion, sexo, fecha_nacimiento, lugar_nacimiento, estado, pais, direccion, telefono, peso, Altura, observaciones) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-$stmt->bind_param("ssssssssssddss", $cedula, $apellidos, $nombres, $ocupacion, $sexo, $fecha_nacimiento, $lugar_nacimiento, $estado, $pais, $direccion, $telefono, $peso, $Altura, $observaciones);
+// Prepara e inserta el nuevo paciente (INCLUYE NUMERO DE HISTORIA)
+$stmt = $conn->prepare("INSERT INTO pacientes (numero_historia, cedula, apellidos, nombres, ocupacion, sexo, fecha_nacimiento, lugar_nacimiento, estado, pais, direccion, telefono, peso, Altura, observaciones) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+$stmt->bind_param("sssssssssssddss", $numero_historia, $cedula, $apellidos, $nombres, $ocupacion, $sexo, $fecha_nacimiento, $lugar_nacimiento, $estado, $pais, $direccion, $telefono, $peso, $Altura, $observaciones);
 
 if ($stmt->execute()) {
     header("Location: pacientes.php?exito=1");
@@ -64,3 +64,4 @@ if ($stmt->execute()) {
 }
 $stmt->close();
 $conn->close();
+?>

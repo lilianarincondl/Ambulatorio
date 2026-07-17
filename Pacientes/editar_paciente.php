@@ -30,10 +30,10 @@ if ($id <= 0) {
 }
 
 // Inicialización de variables
-$cedula = $apellidos = $nombres = $ocupacion = $sexo = $fecha_nacimiento = $lugar_nacimiento = $estado = $pais = $direccion = $telefono = $peso = $Altura = $observaciones = '';
+$numero_historia = $cedula = $apellidos = $nombres = $ocupacion = $sexo = $fecha_nacimiento = $lugar_nacimiento = $estado = $pais = $direccion = $telefono = $peso = $Altura = $observaciones = '';
 
 // Consulta segura
-$stmt = $conn->prepare("SELECT cedula, apellidos, nombres, ocupacion, sexo, fecha_nacimiento, lugar_nacimiento, estado, pais, direccion, telefono, peso, Altura, observaciones FROM pacientes WHERE id = ?");
+$stmt = $conn->prepare("SELECT numero_historia, cedula, apellidos, nombres, ocupacion, sexo, fecha_nacimiento, lugar_nacimiento, estado, pais, direccion, telefono, peso, Altura, observaciones FROM pacientes WHERE id = ?");
 $stmt->bind_param("i", $id);
 $stmt->execute();
 $stmt->store_result();
@@ -45,7 +45,7 @@ if ($stmt->num_rows === 0) {
     exit();
 }
 
-$stmt->bind_result($cedula, $apellidos, $nombres, $ocupacion, $sexo, $fecha_nacimiento, $lugar_nacimiento, $estado, $pais, $direccion, $telefono, $peso, $Altura, $observaciones);
+$stmt->bind_result($numero_historia, $cedula, $apellidos, $nombres, $ocupacion, $sexo, $fecha_nacimiento, $lugar_nacimiento, $estado, $pais, $direccion, $telefono, $peso, $Altura, $observaciones);
 $stmt->fetch();
 $stmt->close();
 $conn->close();
@@ -205,15 +205,19 @@ $conn->close();
                 
                 <div class="col-12"><div class="section-label">Datos Personales</div></div>
 
-                <div class="col-md-4">
+                <div class="col-md-3">
+                    <label class="form-label">N° Historia</label>
+                    <input class="form-control" type="text" name="numero_historia" required value="<?php echo htmlspecialchars($numero_historia); ?>">
+                </div>
+                <div class="col-md-3">
                     <label class="form-label">Cédula de Identidad</label>
                     <input class="form-control" type="text" name="cedula" required value="<?php echo htmlspecialchars($cedula); ?>">
                 </div>
-                <div class="col-md-4">
+                <div class="col-md-3">
                     <label class="form-label">Nombres</label>
                     <input class="form-control" type="text" name="nombres" required value="<?php echo htmlspecialchars($nombres); ?>">
                 </div>
-                <div class="col-md-4">
+                <div class="col-md-3">
                     <label class="form-label">Apellidos</label>
                     <input class="form-control" type="text" name="apellidos" required value="<?php echo htmlspecialchars($apellidos); ?>">
                 </div>

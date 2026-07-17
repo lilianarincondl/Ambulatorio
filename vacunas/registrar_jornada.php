@@ -13,7 +13,7 @@
     <nav class="navbar navbar-expand-lg fixed-top shadow">
         <div class="container-fluid">
         <a class="navbar-brand d-flex align-items-center" href="#">
-            <img src="../icons/logo.png" alt="Logo Ambulatorio" style="height: 40px; margin-right: 10px;" />
+            <img src="../icons/logo.png" alt="Logo" style="height: 40px; background: white; border-radius: 50%; padding: 2px; margin-right: 10px;">
            Ambulatorio Urbano I Libertador
         </a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
@@ -813,4 +813,3 @@
 </body>
 </html>
 
-<!-- Este archivo debe ser renombrado a registrar_jornada.php y actualizar los enlaces internos en el sistema. -->

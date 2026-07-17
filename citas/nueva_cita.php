@@ -108,15 +108,17 @@ if (isset($_SESSION['datos_temporales'])) {
                             <div class="row">
                                 <div class="col-md-6 mb-3">
                                     <label>Paciente:</label>
-                                    <input type="text" id="filtro_paciente" class="form-control input-filtro" placeholder="🔍 Escriba para buscar..." autocomplete="off">
+                                    <input type="text" id="filtro_paciente" class="form-control input-filtro" placeholder="🔍 Buscar nombre, apellido o cédula..." autocomplete="off">
                                     <select name="id_paciente" id="select_paciente" class="form-control select-filtrable" required>
                                         <option value="">-- Seleccione un Paciente --</option>
                                         <?php
-                                        // Cargamos todos los pacientes
-                                        $res_p = $conn->query("SELECT id, nombres, cedula FROM pacientes ORDER BY nombres ASC");
+                                        // MODIFICACIÓN AQUÍ: Se añadió 'apellidos' a la consulta SQL
+                                        $res_p = $conn->query("SELECT id, nombres, apellidos, cedula FROM pacientes ORDER BY nombres ASC");
                                         while($row = $res_p->fetch_assoc()){
                                             $selected = ($row['id'] == $temp['id_paciente']) ? 'selected' : '';
-                                            echo "<option value='".$row['id']."' $selected>".$row['nombres']." (V-".$row['cedula'].")</option>";
+                                            // MODIFICACIÓN AQUÍ: Se unen nombres, apellidos y cédula en el texto de la opción
+                                            $nombre_completo = htmlspecialchars($row['nombres'] . ' ' . $row['apellidos']);
+                                            echo "<option value='".$row['id']."' $selected>".$nombre_completo." (V-".$row['cedula'].")</option>";
                                         }
                                         ?>
                                     </select>
@@ -127,22 +129,24 @@ if (isset($_SESSION['datos_temporales'])) {
                                     <select name="id_medico" class="form-control" required>
                                         <option value="">-- Seleccione un Médico --</option>
                                         <?php
-                                        // -------------------------------------------------------------------
-                                        // AQUÍ ESTÁ EL CAMBIO IMPORTANTE:
-                                        // Filtramos para que NO aparezca el Admin.
-                                        // Ajusta 'Admin' o 'Administrador' según cómo se llame en tu BD.
-                                        // También puedes usar: WHERE id != 1 (Si el admin es el ID 1)
-                                        // -------------------------------------------------------------------
-                                        $sql_medicos = "SELECT id, nombre FROM usuario_medico 
-                                                        WHERE nombre NOT LIKE '%Admin%' 
-                                                        AND nombre NOT LIKE '%Administrador%' 
+                                        $sql_medicos = "SELECT id, nombre, cargo FROM usuario_medico 
+                                                        WHERE cargo NOT LIKE '%Enfermera%' 
+                                                        AND cargo NOT LIKE '%Admin%' 
                                                         ORDER BY nombre ASC";
                                         
                                         $res_m = $conn->query($sql_medicos);
                                         
+                                        if (!$res_m) {
+                                            $sql_medicos = "SELECT id, nombre FROM usuario_medico ORDER BY nombre ASC";
+                                            $res_m = $conn->query($sql_medicos);
+                                        }
+
                                         while($row = $res_m->fetch_assoc()){
                                             $selected = ($row['id'] == $temp['id_medico']) ? 'selected' : '';
-                                            echo "<option value='".$row['id']."' $selected>Dr/a. ".$row['nombre']."</option>";
+                                            
+                                            $especialidad = isset($row['cargo']) ? " (" . $row['cargo'] . ")" : "";
+                                            
+                                            echo "<option value='".$row['id']."' $selected>Dr/a. ".$row['nombre'].$especialidad."</option>";
                                         }
                                         ?>
                                     </select>

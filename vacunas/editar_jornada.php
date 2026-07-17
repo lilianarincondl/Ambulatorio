@@ -627,67 +627,67 @@ endfor; ?>
             const newRow = table.insertRow();
             rowCount = getRowCount() + 1;
             newRow.innerHTML = `
-<td class="serial">${rowCount}</td>
-<td><input type="text" name="nombre[]" required></td>
-<td><input type="text" name="apellido[]" required></td>
-<td><input type="date" name="fecha_nacimiento[]" required></td>
-<td>
-    <select name="nacionalidad[]">
-        <option value="">Seleccionar</option>
-        <option value="Ecuatoriana">Ecuatoriana</option>
-        <option value="Colombiana">Colombiana</option>
-        <option value="Peruana">Peruana</option>
-        <option value="Venezolana">Venezolana</option>
-        <option value="Otra">Otra</option>
-    </select>
-</td>
-<td><input type="text" name="documento[]" required></td>
-<td><input type="number" name="orden_hijo[]" min="1" max="20"></td>
-<td><input type="text" name="direccion[]"></td>
-<td><input type="text" name="etnia[]"></td>
-<td><input type="number" name="edad[]" min="0" max="120"></td>
-<td>
-    <select name="sexo[]">
-        <option value="M">M</option>
-        <option value="F">F</option>
-    </select>
-</td>
-<td><input type="text" name="grupo_especial[]"></td>
-<!-- BCG -->
-<td><div class="dosis-container"><button type="button" class="dosis-btn d11" data-dosis="DU">DU</button></div><input type="hidden" name="dosis_bcg[]" value=""></td>
-<!-- Hepatitis B -->
-<td><div class="dosis-container"><button type="button" class="dosis-btn d11" data-dosis="DU">DU</button><button type="button" class="dosis-btn d10" data-dosis="DA">DA</button><button type="button" class="dosis-btn d1" data-dosis="1D">1D</button><button type="button" class="dosis-btn d2" data-dosis="2D">2D</button><button type="button" class="dosis-btn d3" data-dosis="3D">3D</button></div><input type="hidden" name="dosis_hepb[]" value=""></td>
-<!-- ROTAVIRUS -->
-<td><div class="dosis-container"><button type="button" class="dosis-btn d1" data-dosis="1D">1D</button><button type="button" class="dosis-btn d2" data-dosis="2D">2D</button></div><input type="hidden" name="dosis_rotavirus[]" value=""></td>
-<!-- PENTAVALENTE -->
-<td><div class="dosis-container"><button type="button" class="dosis-btn d1" data-dosis="1D">1D</button><button type="button" class="dosis-btn d2" data-dosis="2D">2D</button><button type="button" class="dosis-btn d3" data-dosis="3D">3D</button><button type="button" class="dosis-btn d8" data-dosis="1REF">1REF</button><button type="button" class="dosis-btn d9" data-dosis="2REF">2REF</button></div><input type="hidden" name="dosis_pentavalente[]" value=""></td>
-<!-- POLIO INYECTABLE -->
-<td><div class="dosis-container"><button type="button" class="dosis-btn d1" data-dosis="1D">1D</button><button type="button" class="dosis-btn d2" data-dosis="2D">2D</button><button type="button" class="dosis-btn d3" data-dosis="3D">3D</button></div><input type="hidden" name="dosis_polio_iny[]" value=""></td>
-<!-- POLIO ORAL -->
-<td><div class="dosis-container"><button type="button" class="dosis-btn d1" data-dosis="1D">1D</button><button type="button" class="dosis-btn d2" data-dosis="2D">2D</button><button type="button" class="dosis-btn d3" data-dosis="3D">3D</button><button type="button" class="dosis-btn d8" data-dosis="1REF">1REF</button><button type="button" class="dosis-btn d9" data-dosis="2REF">2REF</button><button type="button" class="dosis-btn d10" data-dosis="DA">DA</button></div><input type="hidden" name="dosis_polio_oral[]" value=""></td>
-<!-- NEUMOCOCO CONJUGADA -->
-<td><div class="dosis-container"><button type="button" class="dosis-btn d1" data-dosis="1D">1D</button><button type="button" class="dosis-btn d2" data-dosis="2D">2D</button><button type="button" class="dosis-btn d8" data-dosis="1REF">1REF</button></div><input type="hidden" name="dosis_neumo_conj[]" value=""></td>
-<!-- INFLUENZA ESTACIONAL -->
-<td><div class="dosis-container"><button type="button" class="dosis-btn d1" data-dosis="1D">1D</button><button type="button" class="dosis-btn d2" data-dosis="2D">2D</button><button type="button" class="dosis-btn d12" data-dosis="DE">DE</button></div><input type="hidden" name="dosis_influenza[]" value=""></td>
-<!-- FIEBRE AMARILLA -->
-<td><div class="dosis-container"><button type="button" class="dosis-btn d11" data-dosis="DU">DU</button></div><input type="hidden" name="dosis_fiebre_ama[]" value=""></td>
-<!-- SARAMPIÓN RUBÉOLA PAROTIDITIS (SRP) -->
-<td><div class="dosis-container"><button type="button" class="dosis-btn d1" data-dosis="1D">1D</button><button type="button" class="dosis-btn d2" data-dosis="2D">2D</button><button type="button" class="dosis-btn d10" data-dosis="DA">DA</button></div><input type="hidden" name="dosis_srp[]" value=""></td>
-<!-- TOXOIDE TETÁNICO DIFTÉRICO -->
-<td><div class="dosis-container"><button type="button" class="dosis-btn d1" data-dosis="1D">1D</button><button type="button" class="dosis-btn d2" data-dosis="2D">2D</button><button type="button" class="dosis-btn d3" data-dosis="3D">3D</button><button type="button" class="dosis-btn d4" data-dosis="4D">4D</button><button type="button" class="dosis-btn d5" data-dosis="5D">5D</button><button type="button" class="dosis-btn d10" data-dosis="DA">DA</button></div><input type="hidden" name="dosis_toxoide[]" value=""></td>
-<!-- NEUMOCOCO POLISACÁRIDA -->
-<td><div class="dosis-container"><button type="button" class="dosis-btn d1" data-dosis="1D">1D</button><button type="button" class="dosis-btn d8" data-dosis="1REF">1REF</button></div><input type="hidden" name="dosis_neumo_poli[]" value=""></td>
-<!-- MENINGOCÓCICA B-C -->
-<td><div class="dosis-container"><button type="button" class="dosis-btn d1" data-dosis="1D">1D</button><button type="button" class="dosis-btn d2" data-dosis="2D">2D</button></div><input type="hidden" name="dosis_meningo[]" value=""></td>
-<!-- ANTI-RÁBICA HUMANA PRE -->
-<td><div class="dosis-container"><button type="button" class="dosis-btn d1" data-dosis="1D">1D</button><button type="button" class="dosis-btn d2" data-dosis="2D">2D</button><button type="button" class="dosis-btn d8" data-dosis="1REF">1REF</button></div><input type="hidden" name="dosis_rabia_pre[]" value=""></td>
-<!-- ANTI-RÁBICA HUMANA POST -->
-<td><div class="dosis-container"><button type="button" class="dosis-btn d1" data-dosis="1D">1D</button><button type="button" class="dosis-btn d2" data-dosis="2D">2D</button><button type="button" class="dosis-btn d3" data-dosis="3D">3D</button><button type="button" class="dosis-btn d4" data-dosis="4D">4D</button><button type="button" class="dosis-btn d5" data-dosis="5D">5D</button><button type="button" class="dosis-btn d6" data-dosis="6D">6D</button><button type="button" class="dosis-btn d7" data-dosis="7D">7D</button></div><input type="hidden" name="dosis_rabia_post[]" value=""></td>
-<td><input type="text" name="observaciones[]"></td>
-<td>
-    <button type="button" class="delete-row"><i class="fas fa-trash"></i></button>
-</td>
-`;
+                        <td class="serial">${rowCount}</td>
+                        <td><input type="text" name="nombre[]" required></td>
+                        <td><input type="text" name="apellido[]" required></td>
+                        <td><input type="date" name="fecha_nacimiento[]" required></td>
+                        <td>
+                            <select name="nacionalidad[]">
+                                <option value="">Seleccionar</option>
+                                <option value="Ecuatoriana">Ecuatoriana</option>
+                                <option value="Colombiana">Colombiana</option>
+                                <option value="Peruana">Peruana</option>
+                                <option value="Venezolana">Venezolana</option>
+                                <option value="Otra">Otra</option>
+                            </select>
+                        </td>
+                        <td><input type="text" name="documento[]" required></td>
+                        <td><input type="number" name="orden_hijo[]" min="1" max="20"></td>
+                        <td><input type="text" name="direccion[]"></td>
+                        <td><input type="text" name="etnia[]"></td>
+                        <td><input type="number" name="edad[]" min="0" max="120"></td>
+                        <td>
+                            <select name="sexo[]">
+                                <option value="M">M</option>
+                                <option value="F">F</option>
+                            </select>
+                        </td>
+                        <td><input type="text" name="grupo_especial[]"></td>
+                        <!-- BCG -->
+                        <td><div class="dosis-container"><button type="button" class="dosis-btn d11" data-dosis="DU">DU</button></div><input type="hidden" name="dosis_bcg[]" value=""></td>
+                        <!-- Hepatitis B -->
+                        <td><div class="dosis-container"><button type="button" class="dosis-btn d11" data-dosis="DU">DU</button><button type="button" class="dosis-btn d10" data-dosis="DA">DA</button><button type="button" class="dosis-btn d1" data-dosis="1D">1D</button><button type="button" class="dosis-btn d2" data-dosis="2D">2D</button><button type="button" class="dosis-btn d3" data-dosis="3D">3D</button></div><input type="hidden" name="dosis_hepb[]" value=""></td>
+                        <!-- ROTAVIRUS -->
+                        <td><div class="dosis-container"><button type="button" class="dosis-btn d1" data-dosis="1D">1D</button><button type="button" class="dosis-btn d2" data-dosis="2D">2D</button></div><input type="hidden" name="dosis_rotavirus[]" value=""></td>
+                        <!-- PENTAVALENTE -->
+                        <td><div class="dosis-container"><button type="button" class="dosis-btn d1" data-dosis="1D">1D</button><button type="button" class="dosis-btn d2" data-dosis="2D">2D</button><button type="button" class="dosis-btn d3" data-dosis="3D">3D</button><button type="button" class="dosis-btn d8" data-dosis="1REF">1REF</button><button type="button" class="dosis-btn d9" data-dosis="2REF">2REF</button></div><input type="hidden" name="dosis_pentavalente[]" value=""></td>
+                        <!-- POLIO INYECTABLE -->
+                        <td><div class="dosis-container"><button type="button" class="dosis-btn d1" data-dosis="1D">1D</button><button type="button" class="dosis-btn d2" data-dosis="2D">2D</button><button type="button" class="dosis-btn d3" data-dosis="3D">3D</button></div><input type="hidden" name="dosis_polio_iny[]" value=""></td>
+                        <!-- POLIO ORAL -->
+                        <td><div class="dosis-container"><button type="button" class="dosis-btn d1" data-dosis="1D">1D</button><button type="button" class="dosis-btn d2" data-dosis="2D">2D</button><button type="button" class="dosis-btn d3" data-dosis="3D">3D</button><button type="button" class="dosis-btn d8" data-dosis="1REF">1REF</button><button type="button" class="dosis-btn d9" data-dosis="2REF">2REF</button><button type="button" class="dosis-btn d10" data-dosis="DA">DA</button></div><input type="hidden" name="dosis_polio_oral[]" value=""></td>
+                        <!-- NEUMOCOCO CONJUGADA -->
+                        <td><div class="dosis-container"><button type="button" class="dosis-btn d1" data-dosis="1D">1D</button><button type="button" class="dosis-btn d2" data-dosis="2D">2D</button><button type="button" class="dosis-btn d8" data-dosis="1REF">1REF</button></div><input type="hidden" name="dosis_neumo_conj[]" value=""></td>
+                        <!-- INFLUENZA ESTACIONAL -->
+                        <td><div class="dosis-container"><button type="button" class="dosis-btn d1" data-dosis="1D">1D</button><button type="button" class="dosis-btn d2" data-dosis="2D">2D</button><button type="button" class="dosis-btn d12" data-dosis="DE">DE</button></div><input type="hidden" name="dosis_influenza[]" value=""></td>
+                        <!-- FIEBRE AMARILLA -->
+                        <td><div class="dosis-container"><button type="button" class="dosis-btn d11" data-dosis="DU">DU</button></div><input type="hidden" name="dosis_fiebre_ama[]" value=""></td>
+                        <!-- SARAMPIÓN RUBÉOLA PAROTIDITIS (SRP) -->
+                        <td><div class="dosis-container"><button type="button" class="dosis-btn d1" data-dosis="1D">1D</button><button type="button" class="dosis-btn d2" data-dosis="2D">2D</button><button type="button" class="dosis-btn d10" data-dosis="DA">DA</button></div><input type="hidden" name="dosis_srp[]" value=""></td>
+                        <!-- TOXOIDE TETÁNICO DIFTÉRICO -->
+                        <td><div class="dosis-container"><button type="button" class="dosis-btn d1" data-dosis="1D">1D</button><button type="button" class="dosis-btn d2" data-dosis="2D">2D</button><button type="button" class="dosis-btn d3" data-dosis="3D">3D</button><button type="button" class="dosis-btn d4" data-dosis="4D">4D</button><button type="button" class="dosis-btn d5" data-dosis="5D">5D</button><button type="button" class="dosis-btn d10" data-dosis="DA">DA</button></div><input type="hidden" name="dosis_toxoide[]" value=""></td>
+                        <!-- NEUMOCOCO POLISACÁRIDA -->
+                        <td><div class="dosis-container"><button type="button" class="dosis-btn d1" data-dosis="1D">1D</button><button type="button" class="dosis-btn d8" data-dosis="1REF">1REF</button></div><input type="hidden" name="dosis_neumo_poli[]" value=""></td>
+                        <!-- MENINGOCÓCICA B-C -->
+                        <td><div class="dosis-container"><button type="button" class="dosis-btn d1" data-dosis="1D">1D</button><button type="button" class="dosis-btn d2" data-dosis="2D">2D</button></div><input type="hidden" name="dosis_meningo[]" value=""></td>
+                        <!-- ANTI-RÁBICA HUMANA PRE -->
+                        <td><div class="dosis-container"><button type="button" class="dosis-btn d1" data-dosis="1D">1D</button><button type="button" class="dosis-btn d2" data-dosis="2D">2D</button><button type="button" class="dosis-btn d8" data-dosis="1REF">1REF</button></div><input type="hidden" name="dosis_rabia_pre[]" value=""></td>
+                        <!-- ANTI-RÁBICA HUMANA POST -->
+                        <td><div class="dosis-container"><button type="button" class="dosis-btn d1" data-dosis="1D">1D</button><button type="button" class="dosis-btn d2" data-dosis="2D">2D</button><button type="button" class="dosis-btn d3" data-dosis="3D">3D</button><button type="button" class="dosis-btn d4" data-dosis="4D">4D</button><button type="button" class="dosis-btn d5" data-dosis="5D">5D</button><button type="button" class="dosis-btn d6" data-dosis="6D">6D</button><button type="button" class="dosis-btn d7" data-dosis="7D">7D</button></div><input type="hidden" name="dosis_rabia_post[]" value=""></td>
+                        <td><input type="text" name="observaciones[]"></td>
+                        <td>
+                            <button type="button" class="delete-row"><i class="fas fa-trash"></i></button>
+                        </td>
+                        `;
             addDosisButtonEvents(newRow);
             newRow.querySelector('.delete-row').addEventListener('click', function() {
                 const inputs = newRow.querySelectorAll('input, select');

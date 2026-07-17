@@ -36,7 +36,8 @@ $where = "";
 $param_busqueda = ""; // Para mantener la búsqueda en los enlaces de paginación
 if (!empty($_GET['busqueda'])) {
     $busqueda = $conn->real_escape_string($_GET['busqueda']);
-    $where = "WHERE nombres LIKE '%$busqueda%' OR apellidos LIKE '%$busqueda%' OR cedula LIKE '%$busqueda%'";
+    // AQUÍ AÑADIMOS numero_historia AL BUSCADOR
+    $where = "WHERE numero_historia LIKE '%$busqueda%' OR nombres LIKE '%$busqueda%' OR apellidos LIKE '%$busqueda%' OR cedula LIKE '%$busqueda%'";
     $param_busqueda = "&busqueda=" . urlencode($_GET['busqueda']);
 }
 
@@ -141,7 +142,7 @@ $result = $conn->query($sql);
           <div class="col-md-6">
               <form class="d-flex" method="get" action="">
                 <input class="form-control search-input" type="search" name="busqueda" 
-                       placeholder="Buscar por nombre, apellido o cédula..." 
+                       placeholder="Buscar por número, nombre, apellido o cédula..." 
                        value="<?php echo isset($_GET['busqueda']) ? htmlspecialchars($_GET['busqueda']) : '' ?>">
                 <button class="btn btn-search px-4" type="submit">Buscar</button>
                 
@@ -158,6 +159,7 @@ $result = $conn->query($sql);
               <thead>
                 <tr>
                   <th>#</th>
+                  <th>N° Historia</th>
                   <th>Nombres</th>
                   <th>Apellidos</th>
                   <th>Cédula</th>
@@ -175,6 +177,7 @@ $result = $conn->query($sql);
                 ?>
                     <tr>
                       <td><?php echo $contador++; ?></td>
+                      <td style="font-weight: 700; color: #aa0b0b;"><?php echo isset($row['numero_historia']) ? htmlspecialchars($row['numero_historia']) : ''; ?></td>
                       <td style="font-weight: 500;"><?php echo htmlspecialchars($row['nombres']); ?></td>
                       <td><?php echo htmlspecialchars($row['apellidos']); ?></td>
                       <td><?php echo htmlspecialchars($row['cedula']); ?></td>
@@ -192,7 +195,8 @@ $result = $conn->query($sql);
                 <?php 
                   }
                 } else {
-                  echo '<tr><td colspan="5" class="text-center py-4 text-muted">No se encontraron pacientes registrados.</td></tr>';
+                  // Aumentamos el colspan a 6 porque agregamos una columna nueva
+                  echo '<tr><td colspan="6" class="text-center py-4 text-muted">No se encontraron pacientes registrados.</td></tr>';
                 }
                 ?>
               </tbody>

@@ -13,6 +13,8 @@ if ($conn->connect_error) {
 
 $id = isset($_POST['id']) ? base64_decode($_POST['id']) : 0;
 $id = intval($id);
+// Recibimos el nuevo campo de número de historia
+$numero_historia = isset($_POST['numero_historia']) ? trim($_POST['numero_historia']) : '';
 $cedula = isset($_POST['cedula']) ? trim($_POST['cedula']) : '';
 $apellidos = isset($_POST['apellidos']) ? trim($_POST['apellidos']) : '';
 $nombres = isset($_POST['nombres']) ? trim($_POST['nombres']) : '';
@@ -30,8 +32,9 @@ $observaciones = isset($_POST['observaciones']) ? trim($_POST['observaciones']) 
 
 $mensaje = '';
 
-if ($id <= 0 || empty($cedula) || empty($apellidos) || empty($nombres)) {
-    $mensaje = 'Cédula, apellidos, nombres son obligatorios.';
+// Añadimos validación básica para el número de historia
+if ($id <= 0 || empty($numero_historia) || empty($cedula) || empty($apellidos) || empty($nombres)) {
+    $mensaje = 'N° de Historia, Cédula, apellidos, nombres son obligatorios.';
 } else {
     // Validar cédula única (excepto para el propio paciente)
     $stmt = $conn->prepare("SELECT id FROM pacientes WHERE cedula = ? AND id != ?");
@@ -48,9 +51,11 @@ if ($mensaje !== '') {
     header("Location: editar_paciente.php?id=" . base64_encode($id));
     exit();
 }
-// Corregir tipos: 10 strings, 2 doubles, 1 string (fecha), 1 int
-$stmt = $conn->prepare("UPDATE pacientes SET cedula=?, apellidos=?, nombres=?, ocupacion=?, sexo=?, fecha_nacimiento=?, lugar_nacimiento=?, estado=?, pais=?, direccion=?, telefono=?, peso=?, Altura=?, observaciones=? WHERE id=?");
-$stmt->bind_param("sssssssssssdssi", $cedula, $apellidos, $nombres, $ocupacion, $sexo, $fecha_nacimiento, $lugar_nacimiento, $estado, $pais, $direccion, $telefono, $peso, $Altura, $observaciones, $id);
+
+// Preparamos el UPDATE incluyendo numero_historia
+$stmt = $conn->prepare("UPDATE pacientes SET numero_historia=?, cedula=?, apellidos=?, nombres=?, ocupacion=?, sexo=?, fecha_nacimiento=?, lugar_nacimiento=?, estado=?, pais=?, direccion=?, telefono=?, peso=?, Altura=?, observaciones=? WHERE id=?");
+$stmt->bind_param("ssssssssssssdssi", $numero_historia, $cedula, $apellidos, $nombres, $ocupacion, $sexo, $fecha_nacimiento, $lugar_nacimiento, $estado, $pais, $direccion, $telefono, $peso, $Altura, $observaciones, $id);
+
 if ($stmt->execute()) {
     header("Location: pacientes.php?actualizado=1");
     exit();
@@ -61,3 +66,4 @@ if ($stmt->execute()) {
 }
 $stmt->close();
 $conn->close();
+?>

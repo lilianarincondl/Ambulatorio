@@ -23,15 +23,8 @@ if (isset($_GET['borrar'])) {
     exit();
 }
 
-// Lógica de Búsqueda (Actualizada para incluir CARGO)
-$where = "WHERE id != 1"; // Siempre ocultar al super-admin
-if (!empty($_GET['busqueda'])) {
-    $busqueda = $conn->real_escape_string($_GET['busqueda']);
-    // Agregamos 'OR cargo LIKE...'
-    $where .= " AND (nombre LIKE '%$busqueda%' OR cedula LIKE '%$busqueda%' OR correo LIKE '%$busqueda%' OR cargo LIKE '%$busqueda%')";
-}
-
-$sql = "SELECT * FROM usuario_medico $where ORDER BY nombre ASC";
+// Traemos todo el personal (sin filtros PHP, porque lo haremos en tiempo real con JavaScript)
+$sql = "SELECT * FROM usuario_medico WHERE id != 1 ORDER BY nombre ASC";
 $result = $conn->query($sql);
 ?>
 
@@ -122,16 +115,12 @@ $result = $conn->query($sql);
 
       <div class="row mb-4">
           <div class="col-md-6">
-              <form class="d-flex" method="get" action="">
-                <input class="form-control search-input" type="search" name="busqueda" 
-                       placeholder="Buscar por nombre, cargo o cédula..." 
-                       value="<?php echo isset($_GET['busqueda']) ? htmlspecialchars($_GET['busqueda']) : '' ?>">
-                <button class="btn btn-search px-4" type="submit">Buscar</button>
-                
-                <?php if(!empty($_GET['busqueda'])): ?>
-                    <a href="personal.php" class="btn btn-light ms-2" style="border-radius: 20px; border: 1px solid #ddd;">Limpiar</a>
-                <?php endif; ?>
-              </form>
+              <!-- Cambiado para que funcione con JavaScript en tiempo real -->
+              <div class="d-flex">
+                <input class="form-control search-input" type="search" id="buscador_personal" 
+                       placeholder="🔍 Buscar en tiempo real por nombre, cargo o cédula..." autocomplete="off">
+                <button class="btn btn-search px-4" type="button">Buscar</button>
+              </div>
           </div>
       </div>
 
@@ -142,12 +131,14 @@ $result = $conn->query($sql);
                 <tr>
                   <th>#</th>
                   <th>Nombre Completo</th>
-                  <th>Cargo / Especialidad</th> <th>Cédula</th>
+                  <th>Cargo / Especialidad</th> 
+                  <th>Cédula</th>
                   <th>Correo Electrónico</th>
                   <th class="text-center">Acciones</th>
                 </tr>
               </thead>
-              <tbody>
+              <!-- Agregamos un ID al cuerpo de la tabla para el JavaScript -->
+              <tbody id="tabla_personal">
                 <?php
                 if ($result && $result->num_rows > 0) {
                   $contador = 1;
@@ -159,7 +150,7 @@ $result = $conn->query($sql);
                       <td style="font-weight: 500; color: #003366;"><?php echo htmlspecialchars($row['nombre']); ?></td>
                       
                       <td>
-                          <span class="badge-cargo"><?php echo htmlspecialchars($row['cargo']); ?></span>
+                          <span class="badge-cargo"><?php echo isset($row['cargo']) ? htmlspecialchars($row['cargo']) : 'No asignado'; ?></span>
                       </td>
                       
                       <td><?php echo htmlspecialchars($row['cedula']); ?></td>
@@ -179,7 +170,7 @@ $result = $conn->query($sql);
                 <?php 
                   }
                 } else {
-                  echo '<tr><td colspan="6" class="text-center py-4 text-muted">No se encontraron registros de personal.</td></tr>';
+                  echo '<tr id="fila_vacia"><td colspan="6" class="text-center py-4 text-muted">No se encontraron registros de personal.</td></tr>';
                 }
                 ?>
               </tbody>
@@ -191,9 +182,31 @@ $result = $conn->query($sql);
   </div>
 
   <script src="../bootstrap/js/bootstrap.bundle.min.js"></script>
+  
+  <!-- Script para la búsqueda en tiempo real en la tabla -->
+  <script>
+      document.addEventListener('DOMContentLoaded', function() {
+          var buscador = document.getElementById('buscador_personal');
+          var filas = document.querySelectorAll('#tabla_personal tr:not(#fila_vacia)');
+
+          buscador.addEventListener('keyup', function() {
+              var texto = this.value.toLowerCase();
+
+              filas.forEach(function(fila) {
+                  // Captura todo el texto dentro de la fila (nombre, cargo, cédula, etc.)
+                  var contenidoFila = fila.textContent.toLowerCase();
+                  
+                  if (contenidoFila.includes(texto)) {
+                      fila.style.display = '';
+                  } else {
+                      fila.style.display = 'none';
+                  }
+              });
+          });
+      });
+  </script>
 </body>
 </html>
-
 <?php
 $conn->close();
 ?>
