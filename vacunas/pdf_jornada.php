@@ -73,7 +73,7 @@ ob_start();
         .form-header { width: 100%; font-size: 7.5px; margin-bottom: 3px; line-height: 1.6;}
         .underline { border-bottom: 1px solid #000; display: inline-block; padding-left: 5px; padding-right: 5px; text-transform: uppercase;}
         
-        .nominal-table, .lotes-table { border: 1.5px solid #000; margin-bottom: 5px; }
+        .nominal-table td { border: 1px solid #000; text-align: center; padding: 3px 2px; font-size: 6.5px; text-transform: uppercase;}
         .nominal-table th, .lotes-table th { background-color: #e6e6e6; border: 1px solid #000; text-align: center; padding: 2px; font-size: 6px; font-weight: bold; vertical-align: middle;}
         /* Fijamos la altura de las filas para que no se deformen al ser poquitas */
         .nominal-table td, .lotes-table td { border: 1px solid #000; text-align: center; padding: 2px; font-size: 6.5px; height: 14px; text-transform: uppercase;}
@@ -83,6 +83,21 @@ ob_start();
         .leyenda-top { font-size: 6px; font-weight: bold; margin-bottom: 2px; text-transform: uppercase; }
         .codigos-box { border: 1px solid #000; margin-bottom: 3px; padding: 3px; font-size: 5.5px; line-height: 1.1;}
         .instructivo { font-size: 5.5px; text-align: justify; line-height: 1.1; text-transform: uppercase;}
+        /* Ajustamos la tabla para que no tenga altura fija */
+        .nominal-table td { height: auto; padding: 4px 2px; }
+        
+        /* Paginación en la esquina inferior derecha */
+        .pagenum:before { content: counter(page); }
+        .pagecount:before { content: counter(pages); }
+        
+        .footer-pagination {
+            position: fixed;
+            bottom: 0;
+            right: 0;
+            font-size: 7px;
+            color: #6c757d;
+        }
+
     </style>
 </head>
 <body>
@@ -334,6 +349,10 @@ ob_start();
         <?php endif; ?>
         
     <?php endforeach; ?>
+
+    <div class="footer-pagination">
+        Página <span class="pagenum"></span> de <span class="pagecount"></span>
+    </div>
 
 </body>
 </html>
